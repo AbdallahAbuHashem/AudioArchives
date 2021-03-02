@@ -90,32 +90,6 @@ function Home() {
     setValue(data);
   };
 
-  const onChangeFile = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-    var file = event.target.files[0];
-    let reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => {
-      console.log(file)
-      const example_name = "test.mp3"
-      fetch(`/upload?name=${example_name}&type=${file.type}`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: reader.result
-      }).then((res) => {
-        console.log(res)
-      })
-    };
-    reader.onerror = function (error) {
-      console.log('Error: ', error);
-    }
-    // this.setState({file}); /// if you want to upload latter
-  }
-
   return (
     <Layout className="container">
       <Header className="header-container">
@@ -125,12 +99,6 @@ function Home() {
       </Header>
       <Content>
         <div className="content-container">
-          <input id="myInput"
-            type="file"
-            ref={(ref) => upload = ref}
-            style={{display: 'none'}}
-            onChange={onChangeFile}
-          />
           <div className="title" id="main-page-title">
             Audio Archives
           </div>

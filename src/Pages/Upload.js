@@ -58,7 +58,7 @@ export default function Upload() {
       peopleList: [],
       date: '',
     })
-    const upload_result = await fetch(`/upload?name=${filename}&type=${type}&speakers=${speakersNumber}&ext=${format}`, {
+    const upload_result = await fetch(`/upload?name=${filename}&type=${type}&speakers=${speakersNumber}&ext=${format}&key=${audioRef.id}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

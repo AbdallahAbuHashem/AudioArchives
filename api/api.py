@@ -5,6 +5,17 @@ from .yamnet import inference
 from flask import Flask
 from flask import request
 from google.cloud import speech_v1p1beta1 as speech
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+import threading
+
+# Use a service account
+cred = credentials.Certificate('./service_account_key.json')
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+
 
 def align_sound_speech(sounds, speech_output):
     for word_obj in speech_output:
@@ -24,7 +35,12 @@ def upload_file():
         type = request.args.get('type')
         speakers_num = int(request.args.get('speakers'))
         ext = request.args.get('ext')
-        uri = upload.upload_blob('audio-bucket-206', file, name, type)
+        key = request.args.get('key')
+        uri = upload.upload_blob('audio-bucket-206', file, "{}.{}".format(name, ext), type)
+        doc_ref = db.collection('audioarchives').document(key)
+        doc_ref.update({
+            'audioLink': uri,
+        })
         sounds = inference.run_yamnet(uri)
         encoding = speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED
         if ext == 'flac':
@@ -33,5 +49,9 @@ def upload_file():
             encoding = speech.RecognitionConfig.AudioEncoding.MP3
         output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}'.format(name), speakers_num, encoding)
         align_sound_speech(sounds, output)
-        output_uri = upload.upload_output('audio-bucket-206', {'output': output, 'sounds': sounds}, name)
+        output_uri = upload.upload_output('audio-bucket-206', {'output': output, 'sounds': sounds}, "{}.json".format(name))
+        doc_ref.update({
+            'jsonLink': output_uri,
+            'status': 'Processed',
+        })
         return {'file_output': output, 'output_uri': output_uri}
