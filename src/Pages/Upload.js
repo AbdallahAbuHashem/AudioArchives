@@ -3,11 +3,13 @@ import './Upload.css';
 import notification from '../img/Notification.png'
 import { Layout, Menu, Breadcrumb, Button, Row, Col, Input, InputNumber, Radio } from 'antd';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom'
 import firestore from '../firebase'
 
 const { Header, Content, Footer } = Layout;
 export default function Upload() {
-  const [filename, setFilename] = useState('')
+  const history = useHistory();
+  const [title, setTitle] = useState('')
   const [selectedFilename, setSelectedFilename] = useState('')
   const [speakersNumber, setSpeakersNumber] = useState(1)
   const [format, setFormat] = useState('wav')
@@ -21,7 +23,7 @@ export default function Upload() {
     var file = event.target.files[0];
     let reader = new FileReader();
     setSelectedFilename(file.name);
-    setFilename(file.name);
+    setTitle(file.name);
     type = file.type
     reader.readAsDataURL(file)
     reader.onload = async () => {
@@ -49,7 +51,7 @@ export default function Upload() {
   const beginProcessing = async () => {
     const audioRef = firestore.collection('audioarchives').doc();
     const res = await audioRef.set({
-      filename,
+      title,
       speakersNumber,
       format,
       status: 'Processing',
@@ -58,7 +60,7 @@ export default function Upload() {
       peopleList: [],
       date: '',
     })
-    const upload_result = await fetch(`/upload?name=${filename}&type=${type}&speakers=${speakersNumber}&ext=${format}&key=${audioRef.id}`, {
+    fetch(`/upload?name=${title}&type=${type}&speakers=${speakersNumber}&ext=${format}&key=${audioRef.id}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -66,7 +68,7 @@ export default function Upload() {
       },
       body: fileBody
     })
-    console.log(upload_result);
+    history.push(`/`)
   }
 
   return (
@@ -77,7 +79,7 @@ export default function Upload() {
         </div>
       </Header>
       <Content>
-        <div className="content-container">
+        <div className="content-container" style={{alignItems: 'flex-start'}}>
           <input id="myInput"
             type="file"
             ref={(ref) => upload = ref}
@@ -101,13 +103,13 @@ export default function Upload() {
             </Col>
           </Row>
           <Row className="row">
-            <Col span={6} className="label">Filename</Col>
+            <Col span={6} className="label">Title</Col>
             <Col span={2} />
             <Col span={6}>
                 <input
                     placeholder="Name for uploaded file"
-                    value={filename}
-                    onChange={(text) => setFilename(text.target.value)}
+                    value={title}
+                    onChange={(text) => setTitle(text.target.value)}
                     className="filename"
                 />
             </Col>

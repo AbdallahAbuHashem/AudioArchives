@@ -47,7 +47,7 @@ def upload_file():
             encoding = speech.RecognitionConfig.AudioEncoding.FLAC
         elif ext == 'mp3':
             encoding = speech.RecognitionConfig.AudioEncoding.MP3
-        output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}'.format(name), speakers_num, encoding)
+        output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}.{}'.format(name, ext), speakers_num, encoding)
         align_sound_speech(sounds, output)
         output_uri = upload.upload_output('audio-bucket-206', {'output': output, 'sounds': sounds}, "{}.json".format(name))
         doc_ref.update({

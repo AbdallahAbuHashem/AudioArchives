@@ -1,10 +1,12 @@
 import logo from './logo.svg';
 import notification from './img/Notification.png';
+import mic from './img/Mic.png';
 import './App.css';
 import { Button, Layout } from 'antd';
 import { AutoComplete } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
+import firestore from './firebase';
 
 import {
   BrowserRouter as Router,
@@ -51,8 +53,18 @@ function Home() {
   const handleClick = (str, context) => history.push(`/search_results?term=${str}&context=${context}`);
   const [value, setValue] = useState('');
   const [options, setOptions] = useState([]);
+  const [files, setFiles] = useState([]);
   let upload = null;
 
+  useEffect(() => {
+    firestore.collection('audioarchives').onSnapshot((docs) => {
+      let newFiles = []
+      docs.forEach((doc) => {
+        newFiles.push(doc.data())
+      })
+      setFiles(newFiles)
+    })
+  },[])
   const mockVal = (str, list_option = 1) => {
     if (list_option === 1) {
       return {
@@ -109,6 +121,9 @@ function Home() {
             onSearch={onSearch}
             placeholder="Search your archives"
           />
+          <ul className="flex-container wrap" style={{maxWidth: '70%'}}>
+            {files.map(item => <InterviewTile item={item} />)}
+          </ul>
           <Button
             type="primary"
             className="floating-upload"
@@ -119,4 +134,21 @@ function Home() {
       </Content>
     </Layout>
   );
+}
+
+const InterviewTile = ({ item }) => {
+  const todayDate = new Date()
+  const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
+  return (
+    <li className="interview-tile">
+      <div className="interview-tile-upper-container">
+        <img src={mic} className="interview-mic" />
+        <div className="interview-title"> {item.title || item.filename} </div>
+      </div>
+      <div className="interview-tile-lower-container">
+        <div className={item.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.status}`} </div>
+        <div className="interview-date"> {item.data || todayString} </div>
+      </div>
+    </li>
+  )
 }
