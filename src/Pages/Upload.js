@@ -1,11 +1,12 @@
 import '../App.css';
-import { Button, Row, Col, Input, InputNumber } from 'antd';
+import { Layout, Menu, Breadcrumb, Button, Row, Col, Input, InputNumber, Radio } from 'antd';
 import React, { useState } from 'react';
 
-
+const { Header, Content, Footer } = Layout;
 export default function Upload() {
   const [filename, setFilename] = useState('')
   const [speakersNumber, setSpeakersNumber] = useState(1)
+  const [format, setFormat] = useState('wav')
   let upload = null;
   
   const onChangeFile = async (event) => {
@@ -16,8 +17,7 @@ export default function Upload() {
     setFilename(file.name);
     reader.readAsDataURL(file)
     reader.onload = async () => {
-      const example_name = "test.mp3"
-      const upload_result = await fetch(`/upload?name=${example_name}&type=${file.type}`, {
+      const upload_result = await fetch(`/upload?name=${filename}&type=${file.type}&speakers=${speakersNumber}&ext=${format}`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -32,47 +32,71 @@ export default function Upload() {
     }
   }
 
+  const onChange = (e) => {
+    setFormat(e.target.value);
+  }
+
   return (
-    <div className="container">
-      <input id="myInput"
-        type="file"
-        ref={(ref) => upload = ref}
-        style={{display: 'none'}}
-        onChange={onChangeFile}
-      />
-      <Row style={{width: '100%'}}>
-        <Col span={6}>Select file</Col>
-        <Col>
-            <Button
-                type="primary"
-                onClick={()=>{upload.click()}}
-            >
-                upload
-            </Button>
-        </Col>
-      </Row>
+    <Layout className="layout">
+            <Header />
+            <Content style={{ padding: '0 50px', flex: 1, marginTop: 50 }}>
+                <Breadcrumb style={{ margin: '16px 0' }}>
+                    <Breadcrumb.Item>Home</Breadcrumb.Item>
+                    <Breadcrumb.Item>Upload</Breadcrumb.Item>
+                </Breadcrumb>
+                <div className="site-layout-content" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                  <input id="myInput"
+                    type="file"
+                    ref={(ref) => upload = ref}
+                    style={{display: 'none'}}
+                    onChange={onChangeFile}
+                  />
+                  <Row style={{width: '100%', marginBottom: 16}}>
+                    <Col span={6}>Filename</Col>
+                    <Col span={6}>
+                        <Input
+                            placeholder="Name for uploaded file"
+                            value={filename}
+                            onChange={(text) => setFilename(text.target.value)}
+                        />
+                    </Col>
+                  </Row>
 
-      <Row style={{width: '100%'}}>
-        <Col span={6}>Filename</Col>
-        <Col>
-            <Input
-                placeholder="Name for uploaded file"
-                value={filename}
-                onChange={(text) => setFilename(text)}
-            />
-        </Col>
-      </Row>
+                  <Row style={{width: '100%', marginBottom: 16}}>
+                    <Col span={6}>Number of speakers</Col>
+                    <Col span={6}>
+                        <InputNumber
+                            placeholder="Name for uploaded file"
+                            value={speakersNumber}
+                            onChange={(val) => setSpeakersNumber(val)}
+                        />
+                    </Col>
+                  </Row>
 
-      <Row style={{width: '100%'}}>
-        <Col span={6}>Number of speakers</Col>
-        <Col>
-            <InputNumber
-                placeholder="Name for uploaded file"
-                value={speakersNumber}
-                onChange={(val) => setSpeakersNumber(val)}
-            />
-        </Col>
-      </Row>
-    </div>
+                  <Row style={{width: '100%', marginBottom: 16}}>
+                    <Col span={6}>Format</Col>
+                    <Col span={6}>
+                    <Radio.Group onChange={onChange} defaultValue="wav">
+                      <Radio.Button value="wav">WAV</Radio.Button>
+                      <Radio.Button value="flac">FLAC</Radio.Button>
+                      <Radio.Button value="mp3">MP3</Radio.Button>
+                    </Radio.Group>
+                    </Col>
+                  </Row>
+
+                  <Row style={{width: '100%', marginBottom: 16}}>
+                    <Col span={6}>Select file</Col>
+                    <Col span={6}>
+                        <Button
+                            type="primary"
+                            onClick={()=>{upload.click()}}
+                        >
+                            upload
+                        </Button>
+                    </Col>
+                  </Row>
+                </div>
+            </Content>
+        </Layout>
   );
 }

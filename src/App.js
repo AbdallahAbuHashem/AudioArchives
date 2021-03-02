@@ -1,6 +1,7 @@
 import logo from './logo.svg';
+import notification from './img/Notification.png';
 import './App.css';
-import { Button } from 'antd';
+import { Button, Layout } from 'antd';
 import { AutoComplete } from 'antd';
 import React, { useState } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
@@ -19,6 +20,8 @@ import {
 import SearchResults from './Pages/SearchResults'
 import InterviewSearchPreview from './Pages/InterviewSearchPreview'
 import Upload from './Pages/Upload'
+
+const { Header, Footer, Sider, Content } = Layout;
 
 export default function App() {
   return (
@@ -114,27 +117,38 @@ function Home() {
   }
 
   return (
-    <div className="container">
-      <input id="myInput"
-        type="file"
-        ref={(ref) => upload = ref}
-        style={{display: 'none'}}
-        onChange={onChangeFile}
-      />
-      <AutoComplete
-        options={options}
-        style={{
-          width: '50%',
-        }}
-        onSelect={onSelect}
-        onSearch={onSearch}
-        placeholder="Search your archives"
-      />
-      <Button
-        type="primary"
-      >
-        <Link to="/upload">Upload</Link>
-      </Button>
-    </div>
+    <Layout className="container">
+      <Header className="header-container">
+        <div className="header-content">
+          <img src={notification} height={40} width={40}/>
+        </div>
+      </Header>
+      <Content>
+        <div className="content-container">
+          <input id="myInput"
+            type="file"
+            ref={(ref) => upload = ref}
+            style={{display: 'none'}}
+            onChange={onChangeFile}
+          />
+          <div className="title" id="main-page-title">
+            Audio Archives
+          </div>
+          <input
+            options={options}
+            className="autocomplete"
+            onSelect={onSelect}
+            onSearch={onSearch}
+            placeholder="Search your archives"
+          />
+          <Button
+            type="primary"
+            className="floating-upload"
+          >
+            <Link to="/upload" className="button-text">Upload</Link>
+          </Button>
+        </div>
+      </Content>
+    </Layout>
   );
 }

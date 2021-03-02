@@ -5,12 +5,12 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
     """Asynchronously transcribes the audio file specified by the gcs_uri."""
     from google.cloud import speech_v1p1beta1 as speech
     import spacy
-    import paralleldots
+    # import paralleldots
     import operator
 
     output = []
-    paralleldots_api = "ojoSV02rEhEwhHJxhbG0zUl221gzcSojzo6o5dtmx2w"
-    paralleldots.set_api_key(paralleldots_api)
+    # paralleldots_api = "ojoSV02rEhEwhHJxhbG0zUl221gzcSojzo6o5dtmx2w"
+    # paralleldots.set_api_key(paralleldots_api)
 
     nlp = spacy.load("en_core_web_sm")
 
@@ -48,20 +48,18 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
         word_count = 0
         for sent in doc.sents:
             sentence_text = sent.text.split()
-            emotions = paralleldots.emotion(sentence_text)['emotion']
-            top_emotion = max(emotions.items(), key=operator.itemgetter(1))[0]
+            # emotions = paralleldots.emotion(sentence_text)['emotion']
+            # top_emotion = max(emotions.items(), key=operator.itemgetter(1))[0]
             for word in sentence_text:
                 word_stt = result.alternatives[0].words[word_count]
                 speaker_tag = speaker_tagged_result.alternatives[0].words[overall_word_count].speaker_tag
                 # print(word_stt)
-                output_item = {"word": word, "start_time": word_stt.start_time.total_seconds(), "end_time": word_stt.end_time.total_seconds(), "speaker_tag": speaker_tag, "emotion": top_emotion}
+                output_item = {"word": word, "start_time": word_stt.start_time.total_seconds(), "end_time": word_stt.end_time.total_seconds(), "speaker_tag": speaker_tag}
                 output.append(output_item)
                 word_count += 1
                 overall_word_count +=1
             counter += 1
-            if counter % 20 == 0:
-                time.sleep(60)
+            # if counter % 20 == 0:
+                # time.sleep(60)
     return output
-    with open('output.json', 'w') as outfile:
-        json.dump(output, outfile)
     # print(output)
