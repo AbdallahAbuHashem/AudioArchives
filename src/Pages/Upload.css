@@ -1,0 +1,111 @@
+.content-container {
+  padding-left: 124px;
+  padding-right: 124px;
+  align-items: flex-start;
+}
+
+#upload-page-title {
+  margin-bottom: 32px;
+}
+
+.row {
+  margin-left: 70px;
+  width: 100%;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.label {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 30px;
+  letter-spacing: 0.11px;
+  text-align: left;
+}
+
+.file-button {
+  height: 52px;
+  background-color: var(--orange);
+  border-color: var(--orange);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.file-button:focus {
+  background-color: var(--orange);
+  border-color: var(--orange);
+}
+
+.file-button:hover {
+  background-color: var(--orange);
+  border-color: var(--orange);
+}
+
+.filename {
+  padding-right: 16px;
+  padding-left: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.1px;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  border-radius: 8px;
+  border-color: var(--black);
+  border-width: 2px;
+}
+
+.radio-button {
+  height: 52px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.radio-button::before {
+  width: 0 !important;
+  background-color: transparent !important;
+}
+
+.radio-button-selected {
+  background-color: var(--orange) !important;
+  font-size: 22px;
+  line-height: 30px;
+  letter-spacing: 0.11px;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500;
+  color: white !important;
+}
+
+.radio-button-unselected {
+  background-color: white !important;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.1px;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  color: var(--black) !important;
+}
+
+.radio-button-unselected:hover {
+  color: var(--orange) !important;
+}
+
+.radio-button-left {
+  border-radius: 8px 0 0 8px !important;
+  border-width: 2px 0 2px 2px;
+  border-color: var(--black) !important;
+}
+
+.radio-button-center {
+  border-width: 2px 0 2px 0;
+  border-color: var(--black) !important;
+}
+
+.radio-button-right {
+  border-radius: 0 8px 8px 0 !important;
+  border-width: 2px 2px 2px 0;
+  border-color: var(--black) !important;
+}
