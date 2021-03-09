@@ -1,11 +1,11 @@
-@import '~antd/dist/antd.css';
-@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import "~antd/dist/antd.css";
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
 
 :root {
-  --beige: #FBEDE6;
-  --orange: #FF886C;
-  --black: #1A1A1A;
-  --red: #FF004B;
+  --beige: #fbede6;
+  --orange: #ff886c;
+  --black: #1a1a1a;
+  --red: #ff004b;
   --grey: #878787;
 }
 
@@ -68,7 +68,7 @@
   background-color: var(--beige);
 }
 
-.content-container{
+.content-container {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -84,7 +84,7 @@
   flex-direction: row;
 }
 
-.wrap    { 
+.wrap {
   -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
 }
@@ -97,7 +97,7 @@
   font-size: 20px;
   line-height: 30px;
   letter-spacing: 0.1px;
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
   font-weight: 400;
   width: 50%;
   margin-bottom: 32px;
@@ -106,7 +106,7 @@
 }
 
 .title {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
   font-weight: 500;
   font-size: 36px;
   line-height: 44px;
@@ -134,7 +134,7 @@
 }
 
 .button-text {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
   font-weight: 500;
   font-size: 22px;
   line-height: 30px;
@@ -143,7 +143,7 @@
 }
 
 #main-page-title {
-  margin-bottom: 32px
+  margin-bottom: 32px;
 }
 
 .site-layout-content {
@@ -164,8 +164,9 @@
 }
 .layout {
   display: flex;
-  height: 100vh;
+  height: 100%;
   width: 100%;
+  background-color: #fbede6;
 }
 
 .clickable-text:hover {
@@ -181,9 +182,9 @@
   height: 192px;
   border-radius: 8px;
   background-color: white;
-  box-shadow: 2px 2px 0px 0px #1A1A1A;
-  filter: drop-shadow(2px 2px 0px #1A1A1A);
-  border: 2px solid #1A1A1A;
+  box-shadow: 2px 2px 0px 0px #1a1a1a;
+  filter: drop-shadow(2px 2px 0px #1a1a1a);
+  border: 2px solid #1a1a1a;
   margin-right: 26px;
   margin-bottom: 26px;
   padding: 16px;
@@ -195,7 +196,8 @@
   height: 42px;
 }
 
-.interview-tile-upper-container, .interview-tile-lower-container {
+.interview-tile-upper-container,
+.interview-tile-lower-container {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -205,7 +207,7 @@
 .interview-title {
   width: 100%;
   margin-top: 4px;
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
   font-weight: normal;
   font-size: 15px;
   line-height: 22px;
@@ -217,8 +219,9 @@
   align-items: flex-start;
 }
 
-.interview-date, .interview-status {
-  font-family: 'Rubik', sans-serif;
+.interview-date,
+.interview-status {
+  font-family: "Rubik", sans-serif;
   font-weight: normal;
   font-size: 15px;
   line-height: 22px;
