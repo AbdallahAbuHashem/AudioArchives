@@ -19,7 +19,7 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
     audio = speech.RecognitionAudio(uri=gcs_uri)
     config = speech.RecognitionConfig(
         encoding=encoding, #speech.RecognitionConfig.AudioEncoding.FLAC,
-        sample_rate_hertz=44100,
+        #sample_rate_hertz=44100,
         language_code="en-US",
         audio_channel_count=2,
         enable_automatic_punctuation=True,
