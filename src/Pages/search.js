@@ -1,5 +1,5 @@
 /*
- * search.js Functionality: 
+ * search.js Functionality: THIS IS CALLED WHEN THE "SEARCH" BUTTON IS CLICKED, REGARDLESS OF WHETHER OR NOT THERE ARE FILTERS
  * 
  * Input:
  *      - clip jsons in the bucket
@@ -107,10 +107,10 @@ var clip_example_2 =
 }
 
 //EXAMPLE SEARCH STRING
-var input_example = "we ready"; 
+var user_search_string_example = "we ready"; 
 
 //EXAMPLE SEARCH TAGS
-var input_tags_example = {"speakers": ["obama"], "date": ["2020"], "location": [], "topics": []};
+var user_search_tags_example = {"speakers": ["obama"], "date": ["2020"], "location": [], "topics": []};
 
 
 var clips = []; // all of the clip jsons in the database
@@ -139,8 +139,8 @@ function loadData() {
     // These are just for the example above, comment out after implementing the above TO DO's
     clips.push(clip_example_1);
     clips.push(clip_example_2);
-    search = input_example.toLowerCase().split(" ");
-    tags = input_tags_example;
+    search = user_search_string_example.toLowerCase().split(" ");
+    tags = user_search_tags_example;
 }
 
 /*
