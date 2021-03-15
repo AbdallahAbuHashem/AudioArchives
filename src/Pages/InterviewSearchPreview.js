@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
 import AuditoryCuesDropdown from "../Components/AuditoryCuesDropdown"
 import EmotionsDropdown from "../Components/EmotionsDropdown"
+import SpeechTypesDropdown from "../Components/SpeechTypesDropdown"
 
 import {
   BrowserRouter as Router,
@@ -85,7 +86,16 @@ export default function InterviewSearchPreview() {
               padding: "24px",
             }}
           >
-          <EmotionsDropdown/>
+            <SpeechTypesDropdown/>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px",
+            }}
+          >
+            <EmotionsDropdown/>
           </div>
         </div>
         <div
