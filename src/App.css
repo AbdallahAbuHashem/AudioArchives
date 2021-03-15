@@ -229,3 +229,7 @@
 .interview-processed {
   color: var(--red);
 }
+
+.interview-clickable:hover {
+  cursor: pointer;
+}

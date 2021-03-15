@@ -21,6 +21,7 @@ import {
 
 import SearchResults from './Pages/SearchResults'
 import InterviewSearchPreview from './Pages/InterviewSearchPreview'
+import FinalizeInterviewData from './Pages/FinalizeInterviewData'
 import Upload from './Pages/Upload'
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -35,6 +36,9 @@ export default function App() {
           </Route>
           <Route path="/interview_search_preview">
             <InterviewSearchPreview />
+          </Route>
+          <Route path="/finalize_interview_data">
+            <FinalizeInterviewData />
           </Route>
           <Route path="/upload">
             <Upload />
@@ -60,7 +64,7 @@ function Home() {
     firestore.collection('audioarchives').onSnapshot((docs) => {
       let newFiles = []
       docs.forEach((doc) => {
-        newFiles.push(doc.data())
+        newFiles.push({data: doc.data(), key: doc.id})
       })
       setFiles(newFiles)
     })
@@ -122,7 +126,10 @@ function Home() {
             placeholder="Search your archives"
           />
           <ul className="flex-container wrap" style={{maxWidth: '70%'}}>
-            {files.map(item => <InterviewTile item={item} />)}
+            {files.map(item => {
+              return <InterviewTile item={item}/>
+          
+            })}
           </ul>
           <Button
             type="primary"
@@ -137,17 +144,20 @@ function Home() {
 }
 
 const InterviewTile = ({ item }) => {
+  const history = useHistory();
   const todayDate = new Date()
   const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
   return (
-    <li className="interview-tile">
+    <li className={item.data.status === "Processed" ? "interview-tile interview-clickable" : "interview-tile"} onClick={() => {if (item.data.status === "Processed")history.push(`/finalize_interview_data?key=${item.key}`)}}>
       <div className="interview-tile-upper-container">
         <img src={mic} className="interview-mic" />
-        <div className="interview-title"> {item.title || item.filename} </div>
+        <div className="interview-title"> {item.data.title || item.data.filename} </div>
       </div>
       <div className="interview-tile-lower-container">
-        <div className={item.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.status}`} </div>
-        <div className="interview-date"> {item.data || todayString} </div>
+        {item.data.status !== "Finished" && (
+          <div className={item.data.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.data.status}`} </div>
+        )}
+        <div className="interview-date"> {item.data.date || todayString} </div>
       </div>
     </li>
   )
