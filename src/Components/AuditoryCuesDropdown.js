@@ -1,8 +1,8 @@
 import logo from "../logo.svg";
 import "../App.css";
-import { Alert, Button } from "antd";
+import { Button } from "antd";
 import {Typography} from "antd";
-import React, { useState, useRef, createRef, useEffect } from "react";
+import React, { useState } from "react";
 import chevronUp from '../img/chevron_up.png';
 import chevronDown from '../img/chevron_down.png';
 import cryEmoji from '../img/cry_emoji.png';
@@ -15,37 +15,14 @@ const { Text } = Typography;
 export default function AuditoryCuesDropdown() {
 
   const [isOpen, setIsOpen] = useState(true);
-  const [pauses, laughter, crying, yawns] = useState(false);
-  // const dropdownRef = useRef(undefined);
-  // const buttonRef = createRef();
+  const [pauses, setPauses] = useState(false);
+  const [laughter, setLaughter] = useState(false);
+  const [crying, setCrying] = useState(false);
+  const [yawns, setYawns] = useState(false);
 
   const onChange = (e) => {
     console.log(e.target.name)
   }
-
-  // useEffect(() => {
-  //   const handleClickOutside = event => {
-  //     const isDropdownClick = dropdownRef.current && dropdownRef.current.contains(event.target);
-  //     const isButtonClick = buttonRef.current && buttonRef.current.contains(event.target);
-  //     if (isButtonClick) {
-  //       /* If the ref is not defined or the user clicked on the menu, we don’t do anything. */
-  //       return;
-  //     }
-  //
-  //     if (isDropdownClick) {
-  //       return;
-  //     }
-  //
-  //     /* Otherwise we close the menu. */
-  //     setIsOpen(false);
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside); /* handle desktops */
-  //   /* Event cleanup */
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside); /* handle desktops */
-  //   };
-  // }, [dropdownRef, buttonRef]);
 
   return (
     <div classname="filter">
@@ -67,8 +44,8 @@ export default function AuditoryCuesDropdown() {
                   type="checkbox"
                   name="Pauses"
                   style={{marginRight:5}}
-                  defaultChecked={pauses}
-                  onChange={onChange}/>
+                  checked={pauses}
+                  onChange={() => setPauses(!pauses)}/>
                 Pauses
                 <img src={pauseEmoji} style={{marginLeft:4, height:16}}/>
               </label>
@@ -77,8 +54,8 @@ export default function AuditoryCuesDropdown() {
                   type="checkbox"
                   name="Laughter"
                   style={{marginRight:5}}
-                  defaultChecked={laughter}
-                  onChange={onChange}/>
+                  checked={laughter}
+                  onChange={() => setLaughter(!laughter)}/>
                   Laughter
                   <img src={laughEmoji} style={{marginLeft:4, height:16}}/>
               </label>
@@ -87,17 +64,17 @@ export default function AuditoryCuesDropdown() {
                   type="checkbox"
                   name="Crying"
                   style={{marginRight:5}}
-                  defaultChecked={crying}
-                  onChange={onChange}/>
+                  checked={crying}
+                  onChange={() => setCrying(!crying)}/>
                   Crying
                   <img src={cryEmoji} style={{marginLeft:4, height:16}}/>
               </label>
               <label style={{display:"block"}}>
                 <input
                   type="checkbox"
-                  defaultChecked={yawns}
+                  checked={yawns}
                   style={{marginRight:5}}
-                  onChange={onChange}/>
+                  onChange={() => setYawns(!yawns)}/>
                   Yawns
                   <img src={yawnEmoji} style={{marginLeft:4, height:16}}/>
               </label>

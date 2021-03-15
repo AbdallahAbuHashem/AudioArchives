@@ -1,8 +1,8 @@
 import logo from "../logo.svg";
 import "../App.css";
-import { Alert, Button } from "antd";
+import {  Button } from "antd";
 import {Typography} from "antd";
-import React, { useState, useRef, createRef, useEffect } from "react";
+import React, { useState } from "react";
 import chevronUp from '../img/chevron_up.png';
 import chevronDown from '../img/chevron_down.png';
 
@@ -36,7 +36,7 @@ export default function SpeechTypesDropdown() {
                   type="checkbox"
                   name="Whispering"
                   style={{marginRight:5}}
-                  defaultChecked={whispering}
+                  value={whispering}
                   onChange={onChange}/>
                 <text style={{fontStyle:"italic"}}>
                   Whispering
@@ -47,7 +47,7 @@ export default function SpeechTypesDropdown() {
                   type="checkbox"
                   name="Shouting"
                   style={{marginRight:5}}
-                  defaultChecked={shouting}
+                  value={shouting}
                   onChange={onChange}/>
                 <text style={{fontWeight:"bold"}}>
                   Shouting

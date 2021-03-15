@@ -2,7 +2,7 @@ import logo from "../logo.svg";
 import "../App.css";
 import { Alert, Button } from "antd";
 import {Typography} from "antd";
-import React, { useState, useRef, createRef, useEffect } from "react";
+import React, { useState } from "react";
 import chevronUp from '../img/chevron_up.png';
 import chevronDown from '../img/chevron_down.png';
 
@@ -11,11 +11,9 @@ const { Text } = Typography;
 export default function EmotionsDropdown() {
 
   const [isOpen, setIsOpen] = useState(true);
-  const [sad, happy, angry] = useState(false);
-
-  const onChange = (e) => {
-    console.log(e.target.name)
-  }
+  const [sad, setSad] = useState(false);
+  const [happy, setHappy] = useState(false);
+  const [angry, setAngry] = useState(true);
 
   return (
     <div classname="filter">
@@ -37,8 +35,8 @@ export default function EmotionsDropdown() {
                   type="checkbox"
                   name="Sad"
                   style={{marginRight:5}}
-                  defaultChecked={sad}
-                  onChange={onChange}/>
+                  checked={sad}
+                  onChange={() => setSad(!sad)}/>
                 <text style={{backgroundColor:"rgba(55, 132, 187, .3)"}}>
                   Sad
                 </text>
@@ -48,8 +46,8 @@ export default function EmotionsDropdown() {
                   type="checkbox"
                   name="Happy"
                   style={{marginRight:5}}
-                  defaultChecked={happy}
-                  onChange={onChange}/>
+                  checked={happy}
+                  onChange={() => setHappy(!happy)}/>
                 <text style={{backgroundColor:"rgba(255, 136, 108, .3)"}}>
                   Happy
                 </text>
@@ -59,8 +57,8 @@ export default function EmotionsDropdown() {
                   type="checkbox"
                   name="Angry"
                   style={{marginRight:5}}
-                  defaultChecked={angry}
-                  onChange={onChange}/>
+                  checked={angry}
+                  onChange={() => setAngry(!angry)}/>
                   <text style={{backgroundColor:"rgba(224, 53, 53, .3)"}}>
                     Angry
                   </text>
