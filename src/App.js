@@ -291,7 +291,7 @@ const InterviewTile = ({ item }) => {
   const todayDate = new Date();
   const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
   return (
-    <li className={"interview-tile interview-clickable"} onClick={() => {history.push(`/finalize_interview_data?key=${item.key}`)}}>
+    <li className={"interview-tile interview-clickable"} onClick={() => {history.push(`/interview_search_preview?key=${item.id}`)}}>
       <div className="interview-tile-upper-container">
         <img src={mic} className="interview-mic" />
         <div className="interview-title"> {item.title || item.filename} </div>

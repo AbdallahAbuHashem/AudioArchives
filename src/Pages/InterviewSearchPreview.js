@@ -24,7 +24,7 @@ import { words } from "../example_data";
 import { Table, Tag, Space } from "antd";
 
 const { Text } = Typography;
-const TEST_KEY = 'LOMigP5J6tP0XbgeMX6f'
+const TEST_KEY = 'ft1XfkDUVzllWTCG89rj'
 
 const { Header, Content, Footer } = Layout;
 function useQuery() {
@@ -42,9 +42,19 @@ export default function InterviewSearchPreview() {
   const [date, setDate] = useState('')
   const [location, setLocation] = useState('')
   const [currTime, setCurrTime] = useState(0)
+
+  const [sad, setSad] = useState(false);
+  const [happy, setHappy] = useState(false);
+  const [angry, setAngry] = useState(false);
+  const [whispering, setWhispering] = useState(false);
+  const [shouting, setShouting] = useState(false);
+  const [laughter, setLaughter] = useState(false);
+  const [crying, setCrying] = useState(false);
+  const [yawns, setYawns] = useState(false);
+
   let query = useQuery();
-  // const key = query.get("key");
-  const key = TEST_KEY;
+  const key = query.get("key");
+  // const key = TEST_KEY;
   let speaker = 1;
   let audio = null;
 
@@ -111,6 +121,19 @@ export default function InterviewSearchPreview() {
       <>
       {toRenderList.map((utterance) => {
         console.log(utterance)
+
+        const determineBg = (emotion) => {
+          if (happy && emotion === "Happy") {
+            return "rgba(255, 136, 108, .3)"
+          } else if (sad && emotion === "Sad") {
+            return "rgba(55, 132, 187, .3)"
+          } else if (angry && emotion === "Angry") {
+            return "rgba(224, 53, 53, .3)"
+          } else {
+            return "transparent"
+          }
+        }
+
         let wordsComp = utterance['words'].map((wordObj) => {
           let val = (
             <Text
@@ -119,6 +142,7 @@ export default function InterviewSearchPreview() {
                 (audio.audioEl.current.currentTime =
                   wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
               }
+              style={{backgroundColor: determineBg(wordObj['emotion'])}}
             >
               {wordObj.word}{" "}
             </Text>
@@ -168,9 +192,9 @@ export default function InterviewSearchPreview() {
               {title}
             </div>
             <div className="dropdowns-container">
-              <AuditoryCuesDropdown/>
-              <SpeechTypesDropdown/>
-              <EmotionsDropdown/>
+              <AuditoryCuesDropdown />
+              <SpeechTypesDropdown />
+              <EmotionsDropdown sad={sad} happy={happy} angry={angry} setSad={setSad} setHappy={setHappy} setAngry={setAngry}/>
             </div>
           </div>
           

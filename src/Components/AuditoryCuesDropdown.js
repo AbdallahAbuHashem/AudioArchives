@@ -12,13 +12,16 @@ import yawnEmoji from '../img/yawn_emoji.png';
 
 const { Text } = Typography;
 
-export default function AuditoryCuesDropdown() {
+export default function AuditoryCuesDropdown({
+  laughter,
+  setLaughter,
+  crying,
+  setCrying,
+  yawns,
+  setYawns
+}) {
 
   const [isOpen, setIsOpen] = useState(false);
-  const [pauses, setPauses] = useState(false);
-  const [laughter, setLaughter] = useState(false);
-  const [crying, setCrying] = useState(false);
-  const [yawns, setYawns] = useState(false);
 
   const onChange = (e) => {
     console.log(e.target.name)
@@ -37,18 +40,8 @@ export default function AuditoryCuesDropdown() {
         {isOpen ? <img src={chevronUp} style={{marginLeft:20, marginBottom:2,height:12}}/> : <img src={chevronDown} style={{marginLeft:20, marginBottom:2,height:12}}/>}
       </button>
       {isOpen && <div>
-          <div style={{paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white"}}>
+          <div style={{position: 'absolute', paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white", width: '100%'}}>
             <form style={{paddingLeft:10,paddingTop:5, paddingBottom:5}}>
-              <label>
-                <input
-                  type="checkbox"
-                  name="Pauses"
-                  style={{marginRight:5}}
-                  checked={pauses}
-                  onChange={() => setPauses(!pauses)}/>
-                Pauses
-                <img src={pauseEmoji} style={{marginLeft:4, height:16}}/>
-              </label>
               <label style={{display:"block"}}>
                 <input
                   type="checkbox"

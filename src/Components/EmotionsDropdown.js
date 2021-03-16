@@ -8,12 +8,9 @@ import chevronDown from '../img/chevron_down.png';
 
 const { Text } = Typography;
 
-export default function EmotionsDropdown() {
-
+export default function EmotionsDropdown(props) {
+  const {sad, happy, angry, setSad, setHappy, setAngry} = props
   const [isOpen, setIsOpen] = useState(false);
-  const [sad, setSad] = useState(false);
-  const [happy, setHappy] = useState(false);
-  const [angry, setAngry] = useState(true);
 
   return (
     <div className="filter">
@@ -28,7 +25,7 @@ export default function EmotionsDropdown() {
         {isOpen ? <img src={chevronUp} style={{marginLeft:20, marginBottom:2,height:12}}/> : <img src={chevronDown} style={{marginLeft:20, marginBottom:2,height:12}}/>}
       </button>
       {isOpen && <div>
-          <div style={{paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white"}}>
+          <div style={{position: 'absolute', paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white", width: '100%'}}>
             <form style={{paddingLeft:10,paddingTop:5, paddingBottom:5}}>
               <label>
                 <input

@@ -65,7 +65,6 @@ def section_by_section_analysis(model, audio_file, to_flatten):
     return emotions
 
 
-
 def lstm_get_emotion(audio_file):
     to_flatten = False
     x_train, x_test, y_train, y_test, num_labels = extract_data(

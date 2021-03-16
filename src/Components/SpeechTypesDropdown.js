@@ -8,11 +8,9 @@ import chevronDown from '../img/chevron_down.png';
 
 const { Text } = Typography;
 
-export default function SpeechTypesDropdown() {
+export default function SpeechTypesDropdown({ whispering, setWhispering, shouting, setShouting }) {
 
   const [isOpen, setIsOpen] = useState(false);
-  const [whispering, shouting] = useState(false);
-
   const onChange = (e) => {
     console.log(e.target.name)
   }
@@ -29,7 +27,7 @@ export default function SpeechTypesDropdown() {
         {isOpen ? <img src={chevronUp} style={{marginLeft:20, marginBottom:2,height:12}}/> : <img src={chevronDown} style={{marginLeft:20, marginBottom:2,height:12}}/>}
       </button>
       {isOpen && <div>
-          <div style={{paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white"}}>
+          <div style={{position: 'absolute', paddingtop:"2rem",paddingbottom:"2rem", alignItems:"center", backgroundColor:"white", width: '100%'}}>
             <form style={{paddingLeft:10,paddingTop:5, paddingBottom:5}}>
               <label>
                 <input
