@@ -325,3 +325,36 @@
  font-size: 16px;
  line-height: 1.5;
 }
+
+#interview-page-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.dropdowns-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.interview-transcript {
+  flex: 1;
+  overflow: scroll;
+  background: white;
+  padding: 32px;
+  font-family: "Rubik", sans-serif;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.1px;
+  color: var(--black);
+}
+
+.mark-transcript {
+  padding: 0;
+  background-color: #C0DD5E;
+}

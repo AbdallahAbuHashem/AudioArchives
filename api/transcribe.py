@@ -19,9 +19,9 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
     audio = speech.RecognitionAudio(uri=gcs_uri)
     config = speech.RecognitionConfig(
         encoding=encoding, #speech.RecognitionConfig.AudioEncoding.FLAC,
-        #sample_rate_hertz=44100,
+        sample_rate_hertz=48000,
         language_code="en-US",
-        audio_channel_count=2,
+        audio_channel_count=1,
         enable_automatic_punctuation=True,
         enable_speaker_diarization=True,
         diarization_speaker_count=speakers_num,
@@ -39,26 +39,33 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
     # print(len(response.results))
     overall_word_count = 0
     counter = 1
-    speaker_tagged_result = response.results[len(response.results) - 1]
-    for result in response.results:
-        # The first alternative is the most likely one for this portion.
-        # print(u"Transcript: {}".format(result.alternatives[0].transcript))
-        # print("Confidence: {}".format(result.alternatives[0].confidence))
-        doc = nlp(result.alternatives[0].transcript)
-        word_count = 0
-        for sent in doc.sents:
-            sentence_text = sent.text.split()
-            # emotions = paralleldots.emotion(sentence_text)['emotion']
-            # top_emotion = max(emotions.items(), key=operator.itemgetter(1))[0]
-            for word in sentence_text:
-                word_stt = result.alternatives[0].words[word_count]
-                speaker_tag = speaker_tagged_result.alternatives[0].words[overall_word_count].speaker_tag
-                # print(word_stt)
-                output_item = {"word": word, "start_time": word_stt.start_time.total_seconds(), "end_time": word_stt.end_time.total_seconds(), "speaker_tag": speaker_tag}
-                output.append(output_item)
-                word_count += 1
-                overall_word_count +=1
-            counter += 1
+    speaker_tagged_result_1 = response.results[len(response.results) - 1]
+    for wordObj in speaker_tagged_result_1.alternatives[0].words:
+        speaker_tag = str(wordObj.speaker_tag)
+        output_item = {"word": wordObj.word, "start_time": wordObj.start_time.total_seconds(), "end_time": wordObj.end_time.total_seconds(), "speaker_tag": speaker_tag}
+        output.append(output_item)
+
+    output = sorted(output, key=lambda x: x['start_time'], reverse=False)
+    # print(response.results)
+    # for result in response.results:
+    #     # The first alternative is the most likely one for this portion.
+    #     # print(u"Transcript: {}".format(result.alternatives[0].transcript))
+    #     # print("Confidence: {}".format(result.alternatives[0].confidence))
+    #     doc = nlp(result.alternatives[0].transcript)
+    #     word_count = 0
+    #     for sent in doc.sents:
+    #         sentence_text = sent.text.split()
+    #         # emotions = paralleldots.emotion(sentence_text)['emotion']
+    #         # top_emotion = max(emotions.items(), key=operator.itemgetter(1))[0]
+    #         for word in sentence_text:
+    #             word_stt = result.alternatives[0].words[word_count]
+    #             speaker_tag = speaker_tagged_result.alternatives[0].words[word_count].speaker_tag
+    #             # print(word_stt)
+    #             output_item = {"word": word, "start_time": word_stt.start_time.total_seconds(), "end_time": word_stt.end_time.total_seconds(), "speaker_tag": speaker_tag}
+    #             output.append(output_item)
+    #             word_count += 1
+    #             overall_word_count +=1
+    #         counter += 1
             # if counter % 20 == 0:
                 # time.sleep(60)
     return output

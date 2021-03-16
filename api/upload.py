@@ -1,5 +1,6 @@
 from google.cloud import storage
 import base64
+import json
 
 def upload_blob(bucket_name, file, destination_blob_name, type):
     """Uploads a file to the bucket."""
@@ -33,7 +34,7 @@ def upload_output(bucket_name, file, destination_blob_name):
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
     
-    blob.upload_from_string(str(file), content_type='application/json')
+    blob.upload_from_string(json.dumps(file), content_type='application/json')
     blob.make_public()
 
     print(
