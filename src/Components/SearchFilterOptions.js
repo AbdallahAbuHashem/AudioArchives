@@ -11,7 +11,9 @@ const { Text } = Typography;
 export default function SearchFilterOptions() {
 
   const [isOpen, setIsOpen] = useState(true);
+  const [addingSpeakers, setAddingSpeakers] = useState(false);
   const [speakers, setSpeakers] = useState(false);
+  const [addingDates, setAddingDates] = useState(false);
   const [dates, setDates] = useState(false);
   const [addingLocations, setAddingLocations] = useState(false);
   const [locations, setLocations] = useState(true);
@@ -48,18 +50,44 @@ export default function SearchFilterOptions() {
       </div>
       {isOpen && <div>
           <div style={{paddingtop:"2rem",paddingbottom:"2rem",border:"none", backgroundColor:"var(--beige)", alignItems:"center"}}>
-            <form style={{paddingLeft:10,paddingTop:5, paddingBottom:5, dispaly:"flex", width:"80%"}}>
-              <label style={{display:"block", padding:15}}>
-                <Text style={{fontSize:20}}>
-                  Speakers
-                </Text>
-              </label>
-              <label style={{display:"block", padding:15}}>
-                <Text style={{fontSize:20}}>
-                  Dates
-                </Text>
-              </label>
-              <label style={{display:"block", padding:15}}>
+            <div style={{paddingLeft:10,paddingTop:5, paddingBottom:5, dispaly:"flex", width:"80%"}}>
+              <div style={{display:"block", padding:15}}>
+                <div style={{flexDirection:"row", flex:1, display:"flex",justifyContent:"space-between"}}>
+                  <Text style={{margin:10, fontSize:20, display:"flex", flex:2}}>
+                    Speakers
+                  </Text>
+                {addingSpeakers ?
+                  <AddingTextInput/>
+                  :
+                  <button style={{border:"none", backgroundColor:"var(--beige)", justifyContent:"center"}}
+                    onClick={() => {setAddingSpeakers(false);}}
+                    >
+                    <Text style={{fontSize:20, color:"#FF886C"}}>
+                      Add
+                    </Text>
+                  </button>
+                }
+                </div>
+              </div>
+              <div style={{display:"block", padding:15}}>
+                <div style={{flexDirection:"row", flex:1, display:"flex",justifyContent:"space-between"}}>
+                  <Text style={{margin:10, fontSize:20, display:"flex", flex:2}}>
+                    Dates
+                  </Text>
+                  {addingDates ?
+                    <AddingTextInput/>
+                    :
+                    <button style={{border:"none", backgroundColor:"var(--beige)", justifyContent:"center"}}
+                      onClick={() => {setAddingDates(false);}}
+                      >
+                      <Text style={{fontSize:20, color:"#FF886C"}}>
+                        Add
+                      </Text>
+                    </button>
+                  }
+                </div>
+              </div>
+              <div style={{display:"block", padding:15}}>
                 <div style={{flexDirection:"row", flex:1, display:"flex",justifyContent:"space-between"}}>
                   <Text style={{margin:10, fontSize:20, display:"flex", flex:2}}>
                     Locations
@@ -67,17 +95,17 @@ export default function SearchFilterOptions() {
                   {addingLocations ?
                     <AddingTextInput/>
                     :
-                    (<button style={{border:"none", backgroundColor:"var(--beige)", justifyContent:"center"}}
-                      onClick={() => setAddingLocations(true)}
+                    <button style={{border:"none", backgroundColor:"var(--beige)", justifyContent:"center"}}
+                      onClick={() => {setAddingLocations(false);}}
                       >
                       <Text style={{fontSize:20, color:"#FF886C"}}>
                         Add
                       </Text>
-                    </button>)
+                    </button>
                   }
                 </div>
-              </label>
-            </form>
+              </div>
+            </div>
           </div>
         </div>
       }
