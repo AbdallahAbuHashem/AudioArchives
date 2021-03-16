@@ -14,7 +14,7 @@ const { Text } = Typography;
 
 export default function AuditoryCuesDropdown() {
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [pauses, setPauses] = useState(false);
   const [laughter, setLaughter] = useState(false);
   const [crying, setCrying] = useState(false);
@@ -25,7 +25,7 @@ export default function AuditoryCuesDropdown() {
   }
 
   return (
-    <div classname="filter">
+    <div className="filter">
 ‍
       <button
         //ref={buttonRef}

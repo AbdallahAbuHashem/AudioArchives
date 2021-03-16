@@ -10,7 +10,7 @@ const { Text } = Typography;
 
 export default function SpeechTypesDropdown() {
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [whispering, shouting] = useState(false);
 
   const onChange = (e) => {
@@ -18,7 +18,7 @@ export default function SpeechTypesDropdown() {
   }
 
   return (
-    <div classname="filter">
+    <div className="filter">
 ‍
       <button
         onClick={() =>

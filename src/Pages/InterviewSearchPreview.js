@@ -3,11 +3,12 @@ import "../App.css";
 import { Alert, Button } from "antd";
 import { AutoComplete } from "antd";
 import { Layout, Menu, Breadcrumb, Typography } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
 import AuditoryCuesDropdown from "../Components/AuditoryCuesDropdown"
 import EmotionsDropdown from "../Components/EmotionsDropdown"
 import SpeechTypesDropdown from "../Components/SpeechTypesDropdown"
+import firestore from '../firebase'
 
 import {
   BrowserRouter as Router,
@@ -23,7 +24,7 @@ import { words } from "../example_data";
 import { Table, Tag, Space } from "antd";
 
 const { Text } = Typography;
-const TEST_KEY = 'bDqeWMroUq1XF1W3VOcF'
+const TEST_KEY = 'LOMigP5J6tP0XbgeMX6f'
 
 const { Header, Content, Footer } = Layout;
 function useQuery() {
@@ -34,30 +35,123 @@ export default function InterviewSearchPreview() {
   const [title, setTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [transcriptObj, setTranscriptObj] = useState(null)
-  const [recordingLink, setRecordingLink] = useState(null)
-  const [jsonLink, setJsonLin] = useState(null)
+  const [audioLink, setAudioLink] = useState(null)
+  const [jsonLink, setJsonLink] = useState(null)
   const [speakers, setSpeakers] = useState(null)
+  const [topics, setTopics] = useState(null)
+  const [date, setDate] = useState('')
+  const [location, setLocation] = useState('')
+  const [currTime, setCurrTime] = useState(0)
   let query = useQuery();
   // const key = query.get("key");
   const key = TEST_KEY;
   let speaker = 1;
   let audio = null;
 
+  useEffect(() => {
+    const getRecordingData = async () => {
+      let docRef = firestore.doc(`audioarchives/${key}`);
+      let doc = await docRef.get();
+      setTitle(doc.data().title || doc.data().filename)
+      setDate(doc.data().date)
+      setJsonLink(doc.data().jsonLink)
+      setAudioLink(doc.data().audioLink)
+      setSpeakers(doc.data().speakers)
+      setLocation(doc.data().location)
+      setTopics(doc.data().topics)
+    }
+    getRecordingData()
+  }, [])
+
+  useEffect(() => {
+    const getJSON = async () => {
+      if (jsonLink) {
+        const res = await fetch(jsonLink)
+        const json_res = JSON.parse(await res.text())
+        setTranscriptObj(json_res);
+      }
+    }
+    getJSON()
+  }, [jsonLink])
+
+  const updateHighlight = (e) => {
+    console.log(e)
+    setCurrTime(e)
+  }
   return (
     <Layout className="container">
       <Header className="header-container">
         
       </Header>
-      <Content>
+      <Content style={{display: 'contents'}}>
         <div className="content-container">
           
-          <div>
-            <div className="title" id="main-page-title">
-              Audio Archives
+          <div id="interview-page-title">
+            <div className="title" id="main-page-title" style={{textAlign: 'left', flex: 2}}>
+              {title}
+            </div>
+            <div className="dropdowns-container">
+              <AuditoryCuesDropdown/>
+              <SpeechTypesDropdown/>
+              <EmotionsDropdown/>
             </div>
           </div>
           
-          
+          <div className="interview-transcript">
+            {transcriptObj && transcriptObj['output'].map((wordObj) => {
+              let val = null;
+                val = (
+                  <Text
+                    className="clickable-text"
+                    onClick={() =>
+                      (audio.audioEl.current.currentTime =
+                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+                    }
+                  >
+                    {wordObj.word}{" "}
+                  </Text>
+                );
+              if (speaker !== wordObj.speaker_tag) {
+                speaker = wordObj.speaker_tag;
+                val = (
+                  <>
+                    <br />
+                    <Text
+                      className="clickable-text"
+                      style={{fontWeight: 'bold'}}
+                      onClick={() =>
+                        (audio.audioEl.current.currentTime =
+                          wordObj.start_time - 1 > 0
+                            ? wordObj.start_time - 1
+                            : 0)
+                      }
+                    >
+                      {speaker}:{" "}
+                    </Text>
+                    {val}
+                  </>
+                );
+              }
+              if (wordObj.start_time > currTime-1 && wordObj.end_time < currTime + 1) {
+                val = (
+                  <mark className="mark-transcript">{val}</mark>
+                )
+              }
+              return val;
+            })}
+          </div>
+          <ReactAudioPlayer
+            style={{marginBottom: 24, marginTop: 24}}
+            listenInterval={1000}
+            onListen={(e) => updateHighlight(e)}
+            onSeeked={(e) => updateHighlight(e)}
+            ref={(element) => {
+              audio = element;
+            }}
+            src={audioLink}
+            controls
+          />
+
         </div>
       </Content>
     </Layout>

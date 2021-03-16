@@ -24,7 +24,8 @@ db = firestore.client()
 def align_sound_speech(sounds, speech_output):
     for word_obj in speech_output:
         idx = word_obj['start_time'] / 4
-        word_obj['sound'] = sounds[int(idx)][0]
+        if (int(idx) < len(sounds)):
+            word_obj['sound'] = sounds[int(idx)][0]
 
 
 def align_emotion_speech(emotions, speech_output):

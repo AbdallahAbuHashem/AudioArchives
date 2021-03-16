@@ -10,13 +10,13 @@ const { Text } = Typography;
 
 export default function EmotionsDropdown() {
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [sad, setSad] = useState(false);
   const [happy, setHappy] = useState(false);
   const [angry, setAngry] = useState(true);
 
   return (
-    <div classname="filter">
+    <div className="filter">
 ‍
       <button
         //ref={buttonRef}

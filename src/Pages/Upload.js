@@ -96,7 +96,7 @@ function Home() {
       },
       body: fileBody
     })
-    history.push(`/`)
+    history.push(`/browse`)
   }
 
   return (
