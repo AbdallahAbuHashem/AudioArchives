@@ -24,6 +24,7 @@ import InterviewSearchPreview from './Pages/InterviewSearchPreview'
 import FinalizeInterviewData from './Pages/FinalizeInterviewData'
 import Upload from './Pages/Upload'
 import Browse from './Pages/Browse'
+import SearchFilterOptions from './Components/SearchFilterOptions.js'
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -58,56 +59,158 @@ export default function App() {
 
 function Home() {
   const history = useHistory();
-  const handleClick = (str, context) => history.push(`/search_results?term=${str}&context=${context}`);
-  const [value, setValue] = useState('');
-  const [options, setOptions] = useState([]);
-  const [files, setFiles] = useState([]);
-  let upload = null;
+  const [searchStr, setSearchStr] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [clips, setClips] = useState([]);
+  var searchResults = []; // will contain indices to the clips that will be returned to the user, sorted by relevance
+  const sortedIds = []; // will contain the final sorted list of clip ID's
+
+  const unigrams = new Map(); //map of words to their frequencies
+  const bigrams = new Map(); //map of pairs of words to their frequencies
 
   useEffect(() => {
     firestore.collection('audioarchives').onSnapshot((docs) => {
       let newFiles = []
       docs.forEach((doc) => {
-        newFiles.push({data: doc.data(), key: doc.id})
+        newFiles.push(doc.data())
       })
-      setFiles(newFiles)
+      setClips(newFiles)
     })
   },[])
-  const mockVal = (str, list_option = 1) => {
-    if (list_option === 1) {
-      return {
-        value: `Search for ${str} in People`,
-      };
-    } else if (list_option === 2) {
-      return {
-        value: `Search for ${str} in Emotions`,
-      };
-    } else {
-      return {
-        value: `Search for ${str} in Text`,
-      };
+
+  function computeFrequencies() {
+    clips.forEach(function(clip) {
+      if (clip.status == "Processed") {
+          var unigram_frequencies = new Map();
+          var bigram_frequencies = new Map();
+
+          var transcript = fetch(clip.jsonLink)
+          .then(response => response.json())
+            .then(data => {
+              transcript = data["output"];
+              for (let i = 0; i < transcript.length; i++) {
+                  let word = transcript[i]["word"].toLowerCase();
+                  if (unigram_frequencies.has(word)) {
+                      unigram_frequencies.set(word, unigram_frequencies.get(word) + 1);
+                  } else {
+                      unigram_frequencies.set(word, 1);
+                  }
+                  if (i > 0) { //calculate bigram frequencies
+                      var bigram = transcript[i-1]["word"].toLowerCase() + "," + word;
+                      if (bigram_frequencies.has(bigram)) {
+                          bigram_frequencies.set(bigram, bigram_frequencies.get(bigram) + 1);
+                      } else {
+                          bigram_frequencies.set(bigram, 1);
+                      }
+                  }
+              }
+
+              let id = clip.id;
+              unigram_frequencies.set(id, transcript.length);
+              bigram_frequencies.set(id, transcript.length - 1);
+              unigrams.set(id, unigram_frequencies);
+              bigrams.set(id, bigram_frequencies);
+            });
+          } 
+    });
+
+  }
+
+  function computeTFIDF() {
+
+    var unigram_score = Array(unigrams.size).fill(1);
+    var bigram_score = Array(unigrams.size).fill(1);
+
+    console.log(unigrams);
+    console.log(unigrams.size);
+
+    for (let i = 0; i < search.length; i++) {
+        var uni_tfidf = []; //each index is the tfidf score for each document for a given word
+        var bi_tfidf = []; 
+        var uni_df = 0;
+        var bi_df = 0;
+        clips.forEach(function(clip) {
+          if (clip.status == "Processed") {
+            if (unigrams.get(clip.id).has(search[i])) {
+                var uni_count = unigrams.get(clip.id).get(search[i]);
+                uni_count /= unigrams.get(clip.id).get(clip.id);
+                uni_tfidf.push(uni_count);
+                uni_df += 1;
+            } else {
+                uni_tfidf.push(0);
+            }
+
+            if (i > 0) {
+                let bigram = search[i-1] + "," + search[i];
+                if (bigrams.get(clip.id).has(bigram)) {
+                    var bi_count = bigrams.get(clip.id).get(bigram);
+                    bi_count /= bigrams.get(clip.id).get(clip.id);
+                    bi_tfidf.push(bi_count);
+                    bi_df += 1;
+                } else {
+                    bi_tfidf.push(0);
+                }
+            }
+          }
+        });
+
+        let uni_idf = Math.log((1 + unigram_score.length) / (1 + uni_df)) + 1;
+        let bi_idf = Math.log((1 + bigram_score.length) / (1 + bi_df)) + 1;
+
+        for (let j = 0; j < uni_tfidf.length; j++) {
+            unigram_score[j] *= (uni_tfidf[j] * uni_idf);
+            if (i > 0) {
+                bigram_score[j] *= (bi_tfidf[j] * bi_idf);
+            }
+        }
     }
-  };
 
-  const onSearch = (searchText) => {
-    setValue(searchText);
-    setOptions(
-      !searchText ? [] : [mockVal(searchText), mockVal(searchText, 2), mockVal(searchText, 3)],
-    );
-  };
-
-  const onSelect = (data, option) => {
-    if (data === `Search for ${value} in People`) {
-      handleClick(value, 'people');
-    } else if (data === `Search for ${value} in Emotions`) {
-      handleClick(value, 'emotions');
-    } else {
-      handleClick(value, 'text');
+    var score = Array(unigrams.size).fill(1);
+    console.log(unigrams.size);
+    for (let i = 0; i < unigram_score.length; i++) {
+        score[i] = (0.33 * unigram_score[i])  + (0.66 * bigram_score[i]);
     }
-  };
 
-  const onChange = (data) => {
-    setValue(data);
+    
+    return score;
+  }
+
+  function findClips() {
+    var numResults = 0; //number of clips in the results, these clips got a score of > 0
+    
+    var clipRating = computeTFIDF(); //each clip in the database will get a rating, the higher the score the more relevant the clip
+    numResults = clipRating.filter(v => v > 0).length;
+
+    var sorted = clipRating.slice().sort(function(a,b){return b-a});
+    var ranked = clipRating.slice().map(function(v){return sorted.indexOf(v)}); //i.e. [3, 1, 4, 6, 0, 2, 5], 0 --> 5th clip is the best, 6 --> 4th clip is worst
+
+    searchResults = Array(numResults).fill(0);
+    for (let i = 0; i < ranked.length; i++) {
+        let ranking = ranked[i];
+        if (ranking < numResults) {
+            searchResults[ranking] = i;
+        }
+    }
+  }
+
+  function search() {
+    computeFrequencies();
+    findClips();
+
+    let sorted_temp = [];
+    searchResults.forEach(function(clipIndex) {
+        sortedIds.push(clips[clipIndex]);
+    });
+  }
+
+  useEffect(() => {
+    console.log(`${searchStr}`);
+    search();
+  }, [searchStr]);
+
+  const onClick = (searchText) => {
+    setSearchStr(document.getElementById("search-bar").value);
+    setHasSearched(true);
   };
 
   return (
@@ -123,27 +226,67 @@ function Home() {
         </div>
       </Header>
       <Content>
+        {!hasSearched && 
         <div className="content-container">
-          <div className="title" id="main-page-title">
-            Audio Archives
+            <div className="title" id="main-page-title">
+              Audio Archives
+            </div>
+          
+            <div className="search-area">
+              <input
+              className="autocomplete"
+              placeholder="Search your archives"
+              id="search-bar"
+            />
+            <div className="space"></div>
+            <Button
+              type="primary"
+              className="search-button"
+              onClick={onClick}
+            >Search
+            </Button>
+            </div>
           </div>
-          <div className="search-area">
-            <input
-            options={options}
-            className="autocomplete"
-            onSelect={onSelect}
-            onSearch={onSearch}
-            placeholder="Search your archives"
-          />
-          <div className="space"></div>
-          <Button
-            type="primary"
-            className="search-button"
-          >Search
-          </Button>
+        }
+        {hasSearched &&
+          <div className="content-results-container">
+            <div className="search-area">
+              <input
+              className="autocomplete"
+              placeholder={searchStr}
+              id="search-bar"
+              />
+              <div className="space"></div>
+              <Button
+              type="primary"
+              className="search-button"
+              onClick={onClick}
+              >Search
+              </Button>
+            </div>
+            <ul className="flex-container wrap" style={{maxWidth: '70%'}}>
+            {sortedIds.map(item => <InterviewTile item={item} />)}
+          </ul>
           </div>
-        </div>
+        }
       </Content>
     </Layout>
   );
+}
+
+const InterviewTile = ({ item }) => {
+  const todayDate = new Date()
+  const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
+  return (
+    <li className="interview-tile">
+      <div className="interview-tile-upper-container">
+        <img src={mic} className="interview-mic" />
+        <div className="interview-title"> {item.title || item.filename} </div>
+      </div>
+      <div className="interview-tile-lower-container">
+        <div className={item.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.status}`} </div>
+        <div className="interview-date"> {item.data || todayString} </div>
+      </div>
+    </li>
+  )
 }

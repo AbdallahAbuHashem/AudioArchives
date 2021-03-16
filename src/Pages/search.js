@@ -321,7 +321,6 @@ function searchClips() {
     });
 }
 
-
 loadData();
 computeFrequencies();
 expandTags();
