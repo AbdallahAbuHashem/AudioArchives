@@ -3,11 +3,35 @@ import './Upload.css';
 import notification from '../img/Notification.png'
 import { Layout, Menu, Breadcrumb, Button, Row, Col, Input, InputNumber, Radio } from 'antd';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link, BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import firestore from '../firebase'
 
+import App from '../App'
+import Browse from './Browse'
+
 const { Header, Content, Footer } = Layout;
+
 export default function Upload() {
+  return (
+    <Router>
+      <div>
+        <Switch>
+          <Route path="/search">
+            <App />
+          </Route>
+          <Route path="/browse">
+            <Browse />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
+}
+
+function Home() {
   const history = useHistory();
   const [title, setTitle] = useState('')
   const [selectedFilename, setSelectedFilename] = useState('')
@@ -79,6 +103,11 @@ export default function Upload() {
     <Layout className="container">
       <Header className="header-container">
         <div className="header-content">
+          <div className="nav-links">
+            <Link to="/browse" className="header-links">Browse</Link>
+            <Link to="/search" className="header-links">Search</Link>
+            <div className="header-links-selected">Upload</div>
+          </div>
           <img src={notification} height={40} width={40}/>
         </div>
       </Header>
