@@ -16,6 +16,7 @@ import {
 } from "react-router-dom";
 import { words } from "../example_data";
 import { Table, Tag, Space } from 'antd';
+import SearchFilterOptions from '../Components/SearchFilterOptions.js'
 
 const { Header, Content, Footer } = Layout;
 
@@ -72,8 +73,11 @@ export default function SearchResults() {
             <Header>
                 <Search initValue={searchTerm} initContext={searchContext} setSearchContext={setSearchContext} setSearchTerm={setSearchTerm}/>
             </Header>
-            <Content style={{ padding: '0 50px', flex: 1, marginTop: 50 }}>
-                <Table columns={columns} dataSource={tableData} />
+            <Content style={{ padding: '0 50px', flex: 1, marginTop: 50, flexDirection:"column"}}>
+              <div style={{alignItems:"center", flex:1, flexDirection:"row", justifyContent:"center"}}>
+                <SearchFilterOptions/>
+              </div>
+              <Table columns={columns} dataSource={tableData} />
             </Content>
         </Layout>
     )
@@ -84,7 +88,7 @@ function Search({ initValue, initContext, setSearchContext, setSearchTerm }) {
     const handleClick = (str, context) => history.push(`/search_results?term=${str}&context=${context}`);
     const [value, setValue] = useState(`Search for ${initValue} in ${initContext}`);
     const [options, setOptions] = useState([]);
-  
+
     const mockVal = (str, list_option = 1) => {
       if (list_option === 1) {
         return {
@@ -100,14 +104,14 @@ function Search({ initValue, initContext, setSearchContext, setSearchTerm }) {
         };
       }
     };
-  
+
     const onSearch = (searchText) => {
       setValue(searchText);
       setOptions(
         !searchText ? [] : [mockVal(searchText), mockVal(searchText, 2), mockVal(searchText, 3)],
       );
     };
-  
+
     const onSelect = (data, option) => {
       if (data === `Search for ${value} in People`) {
         setSearchContext('people');
@@ -121,11 +125,11 @@ function Search({ initValue, initContext, setSearchContext, setSearchTerm }) {
       }
       setSearchTerm(value);
     };
-  
+
     const onChange = (data) => {
       setValue(data);
     };
-  
+
     return (
       <>
         <AutoComplete
