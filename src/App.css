@@ -358,3 +358,12 @@
   padding: 0;
   background-color: #C0DD5E;
 }
+
+.timestamp-transcript {
+  font-family: "Rubik", sans-serif;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.1px;
+  color: var(--orange);
+}

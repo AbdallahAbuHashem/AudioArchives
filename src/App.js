@@ -65,8 +65,8 @@ function Home() {
   var searchResults = []; // will contain indices to the clips that will be returned to the user, sorted by relevance
   const sortedIds = []; // will contain the final sorted list of clip ID's
 
-  const unigrams = new Map(); //map of words to their frequencies
-  const bigrams = new Map(); //map of pairs of words to their frequencies
+  let unigrams = new Map(); //map of words to their frequencies
+  let bigrams = new Map(); //map of pairs of words to their frequencies
 
   useEffect(() => {
     firestore.collection('audioarchives').onSnapshot((docs) => {
@@ -78,45 +78,42 @@ function Home() {
     })
   },[])
 
-  function computeFrequencies() {
-    clips.forEach(function(clip) {
+  const computeFrequencies = async () => {
+    for (const clip of clips) {
       if (clip.status == "Processed") {
-          var unigram_frequencies = new Map();
-          var bigram_frequencies = new Map();
+        var unigram_frequencies = new Map();
+        var bigram_frequencies = new Map();
 
-          var transcript = fetch(clip.jsonLink)
-          .then(response => response.json())
-            .then(data => {
-              transcript = data["output"];
-              for (let i = 0; i < transcript.length; i++) {
-                  let word = transcript[i]["word"].toLowerCase();
-                  if (unigram_frequencies.has(word)) {
-                      unigram_frequencies.set(word, unigram_frequencies.get(word) + 1);
-                  } else {
-                      unigram_frequencies.set(word, 1);
-                  }
-                  if (i > 0) { //calculate bigram frequencies
-                      var bigram = transcript[i-1]["word"].toLowerCase() + "," + word;
-                      if (bigram_frequencies.has(bigram)) {
-                          bigram_frequencies.set(bigram, bigram_frequencies.get(bigram) + 1);
-                      } else {
-                          bigram_frequencies.set(bigram, 1);
-                      }
-                  }
-              }
+        var response = await fetch(clip.jsonLink)
+        var data = await response.json()
+        var transcript = data["output"]
+        for (let i = 0; i < transcript.length; i++) {
+            let word = transcript[i]["word"].toLowerCase();
+            if (unigram_frequencies.has(word)) {
+                unigram_frequencies.set(word, unigram_frequencies.get(word) + 1);
+            } else {
+                unigram_frequencies.set(word, 1);
+            }
+            if (i > 0) { //calculate bigram frequencies
+                var bigram = transcript[i-1]["word"].toLowerCase() + "," + word;
+                if (bigram_frequencies.has(bigram)) {
+                    bigram_frequencies.set(bigram, bigram_frequencies.get(bigram) + 1);
+                } else {
+                    bigram_frequencies.set(bigram, 1);
+                }
+            }
+        }
 
-              let id = clip.id;
-              unigram_frequencies.set(id, transcript.length);
-              bigram_frequencies.set(id, transcript.length - 1);
-              unigrams.set(id, unigram_frequencies);
-              bigrams.set(id, bigram_frequencies);
-            });
-          } 
-    });
-
+        let id = clip.id;
+        unigram_frequencies.set(id, transcript.length);
+        bigram_frequencies.set(id, transcript.length - 1);
+        unigrams.set(id, unigram_frequencies);
+        bigrams.set(id, bigram_frequencies);
+      } 
+    }
   }
 
-  function computeTFIDF() {
+  const computeTFIDF = () => {
 
     var unigram_score = Array(unigrams.size).fill(1);
     var bigram_score = Array(unigrams.size).fill(1);
@@ -175,7 +172,7 @@ function Home() {
     return score;
   }
 
-  function findClips() {
+  const findClips = async () => {
     var numResults = 0; //number of clips in the results, these clips got a score of > 0
     
     var clipRating = computeTFIDF(); //each clip in the database will get a rating, the higher the score the more relevant the clip
@@ -193,8 +190,8 @@ function Home() {
     }
   }
 
-  function search() {
-    computeFrequencies();
+  const search = async () => {
+    await computeFrequencies();
     findClips();
 
     let sorted_temp = [];
@@ -202,15 +199,9 @@ function Home() {
         sortedIds.push(clips[clipIndex]);
     });
   }
-
-  useEffect(() => {
-    console.log(`${searchStr}`);
-    search();
-  }, [searchStr]);
-
   const onClick = (searchText) => {
-    setSearchStr(document.getElementById("search-bar").value);
     setHasSearched(true);
+    search();
   };
 
   return (
@@ -236,6 +227,8 @@ function Home() {
               <input
               className="autocomplete"
               placeholder="Search your archives"
+              value={searchStr}
+              onChange={(text) => setSearchStr(text.target.value)}
               id="search-bar"
             />
             <div className="space"></div>
@@ -253,7 +246,9 @@ function Home() {
             <div className="search-area">
               <input
               className="autocomplete"
-              placeholder={searchStr}
+              placeholder="Search your archives"
+              value={searchStr}
+              onChange={(text) => setSearchStr(text.target.value)}
               id="search-bar"
               />
               <div className="space"></div>
