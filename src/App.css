@@ -289,3 +289,24 @@
 .interview-processed {
   color: var(--red);
 }
+
+.interview-clickable:hover {
+  cursor: pointer;
+}
+.filter {
+ position: relative;
+ display: inline-block;
+}
+
+.filter__button {
+ border-radius: 0.125rem;
+ padding: 0.5rem 1rem;
+ background-color: #FF886C;
+ background-image: none;
+ cursor: pointer;
+ border: transparent;
+ font-weight: 600;
+ color: white;
+ font-size: 16px;
+ line-height: 1.5;
+}

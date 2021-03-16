@@ -21,6 +21,7 @@ import {
 
 import SearchResults from './Pages/SearchResults'
 import InterviewSearchPreview from './Pages/InterviewSearchPreview'
+import FinalizeInterviewData from './Pages/FinalizeInterviewData'
 import Upload from './Pages/Upload'
 import Browse from './Pages/Browse'
 
@@ -36,6 +37,9 @@ export default function App() {
           </Route>
           <Route path="/interview_search_preview">
             <InterviewSearchPreview />
+          </Route>
+          <Route path="/finalize_interview_data">
+            <FinalizeInterviewData />
           </Route>
           <Route path="/upload">
             <Upload />
@@ -64,7 +68,7 @@ function Home() {
     firestore.collection('audioarchives').onSnapshot((docs) => {
       let newFiles = []
       docs.forEach((doc) => {
-        newFiles.push(doc.data())
+        newFiles.push({data: doc.data(), key: doc.id})
       })
       setFiles(newFiles)
     })

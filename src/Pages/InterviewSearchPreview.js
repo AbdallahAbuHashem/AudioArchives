@@ -5,6 +5,9 @@ import { AutoComplete } from "antd";
 import { Layout, Menu, Breadcrumb, Typography } from "antd";
 import React, { useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
+import AuditoryCuesDropdown from "../Components/AuditoryCuesDropdown"
+import EmotionsDropdown from "../Components/EmotionsDropdown"
+import SpeechTypesDropdown from "../Components/SpeechTypesDropdown"
 
 import {
   BrowserRouter as Router,
@@ -47,18 +50,53 @@ export default function InterviewSearchPreview() {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             padding: "24px",
           }}
         >
-          <Text style={{ fontSize: 30, fontWeight: 600 }}>
-            Michael Lin Interview
-          </Text>
-          <Text>Speakers: Michael Lin, Claire Rosenfeld</Text>
-          <Text>Location: Stanford, CA</Text>
-          <Text>Date: March 2 2020</Text>
-          <Text>Length: 52 minutes</Text>
-          <Text>Topics: COVID, Stanford University</Text>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px",
+            }}
+          >
+            <Text style={{ fontSize: 30, fontWeight: 600 }}>
+              Michael Lin Interview
+            </Text>
+            <Text>Speakers: Michael Lin, Claire Rosenfeld</Text>
+            <Text>Location: Stanford, CA</Text>
+            <Text>Date: March 2 2020</Text>
+            <Text>Length: 52 minutes</Text>
+            <Text>Topics: COVID, Stanford University</Text>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px",
+            }}
+          >
+            <AuditoryCuesDropdown/>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px",
+            }}
+          >
+            <SpeechTypesDropdown/>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px",
+            }}
+          >
+            <EmotionsDropdown/>
+          </div>
         </div>
         <div
           className="site-layout-content"
