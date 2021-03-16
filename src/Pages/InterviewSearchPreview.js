@@ -23,6 +23,7 @@ import { words } from "../example_data";
 import { Table, Tag, Space } from "antd";
 
 const { Text } = Typography;
+const TEST_KEY = 'bDqeWMroUq1XF1W3VOcF'
 
 const { Header, Content, Footer } = Layout;
 function useQuery() {
@@ -30,188 +31,214 @@ function useQuery() {
 }
 
 export default function InterviewSearchPreview() {
+  const [title, setTitle] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [transcriptObj, setTranscriptObj] = useState(null)
+  const [recordingLink, setRecordingLink] = useState(null)
+  const [jsonLink, setJsonLin] = useState(null)
+  const [speakers, setSpeakers] = useState(null)
   let query = useQuery();
-  const context = query.get("context");
-  const term = query.get("term").toLowerCase();
+  // const key = query.get("key");
+  const key = TEST_KEY;
   let speaker = 1;
   let audio = null;
 
   return (
-    <Layout className="layout">
-      <Header>
-        <Search initValue={term} initContext={context} />
+    <Layout className="container">
+      <Header className="header-container">
+        
       </Header>
-      <Content style={{ padding: "0 50px", flex: 1, marginTop: 50 }}>
-        <Breadcrumb style={{ margin: "16px 0" }}>
-          <Breadcrumb.Item>Search</Breadcrumb.Item>
-          <Breadcrumb.Item>Search Results</Breadcrumb.Item>
-          <Breadcrumb.Item>CNN Obama 2012 Interview</Breadcrumb.Item>
-        </Breadcrumb>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            padding: "24px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              padding: "24px",
-            }}
-          >
-            <Text style={{ fontSize: 30, fontWeight: 600 }}>
-              Michael Lin Interview
-            </Text>
-            <Text>Speakers: Michael Lin, Claire Rosenfeld</Text>
-            <Text>Location: Stanford, CA</Text>
-            <Text>Date: March 2 2020</Text>
-            <Text>Length: 52 minutes</Text>
-            <Text>Topics: COVID, Stanford University</Text>
+      <Content>
+        <div className="content-container">
+          
+          <div>
+            <div className="title" id="main-page-title">
+              Audio Archives
+            </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              padding: "24px",
-            }}
-          >
-            <AuditoryCuesDropdown/>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              padding: "24px",
-            }}
-          >
-            <SpeechTypesDropdown/>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              padding: "24px",
-            }}
-          >
-            <EmotionsDropdown/>
-          </div>
-        </div>
-        <div
-          className="site-layout-content"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ height: 200, overflow: "scroll" }}>
-            <Text
-              className="clickable-text"
-              onClick={() =>
-                (audio.audioEl.current.currentTime = words[0].start_time)
-              }
-            >
-              Speaker 1:{" "}
-            </Text>
-            {words.map((wordObj) => {
-              let val = null;
-              if (context === "people" && term === wordObj.speaker_tag) {
-                val = (
-                  <Text
-                    className="clickable-text"
-                    mark
-                    onClick={() =>
-                      (audio.audioEl.current.currentTime =
-                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
-                    }
-                  >
-                    {wordObj.word}{" "}
-                  </Text>
-                );
-              } else if (
-                context === "text" &&
-                term === wordObj.word.toLowerCase()
-              ) {
-                val = (
-                  <Text
-                    className="clickable-text"
-                    mark
-                    onClick={() =>
-                      (audio.audioEl.current.currentTime =
-                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
-                    }
-                  >
-                    {wordObj.word}{" "}
-                  </Text>
-                );
-              } else if (
-                context === "emotions" &&
-                term === wordObj.emotion.toLowerCase()
-              ) {
-                val = (
-                  <Text
-                    className="clickable-text"
-                    mark
-                    onClick={() =>
-                      (audio.audioEl.current.currentTime =
-                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
-                    }
-                  >
-                    {wordObj.word}{" "}
-                  </Text>
-                );
-              } else {
-                val = (
-                  <Text
-                    className="clickable-text"
-                    onClick={() =>
-                      (audio.audioEl.current.currentTime =
-                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
-                    }
-                  >
-                    {wordObj.word}{" "}
-                  </Text>
-                );
-              }
-              if (speaker !== wordObj.speaker_tag) {
-                speaker = wordObj.speaker_tag;
-                return (
-                  <>
-                    <br />
-                    <Text
-                      className="clickable-text"
-                      onClick={() =>
-                        (audio.audioEl.current.currentTime =
-                          wordObj.start_time - 1 > 0
-                            ? wordObj.start_time - 1
-                            : 0)
-                      }
-                    >
-                      {" "}
-                      Speaker {speaker}:{" "}
-                    </Text>
-                    {val}
-                  </>
-                );
-              } else {
-                return val;
-              }
-            })}
-          </div>
-          <ReactAudioPlayer
-            style={{ marginTop: 20 }}
-            ref={(element) => {
-              audio = element;
-            }}
-            src="https://storage.googleapis.com/audio-bucket-206/test_interview.mp3"
-            controls
-          />
+          
+          
         </div>
       </Content>
     </Layout>
   );
+
+  // return (
+    // <Layout className="layout">
+    //   <Header>
+    //     <Search initValue={term} initContext={context} />
+    //   </Header>
+    //   <Content style={{ padding: "0 50px", flex: 1, marginTop: 50 }}>
+    //     <Breadcrumb style={{ margin: "16px 0" }}>
+    //       <Breadcrumb.Item>Search</Breadcrumb.Item>
+    //       <Breadcrumb.Item>Search Results</Breadcrumb.Item>
+    //       <Breadcrumb.Item>CNN Obama 2012 Interview</Breadcrumb.Item>
+    //     </Breadcrumb>
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         flexDirection: "row",
+    //         padding: "24px",
+    //       }}
+    //     >
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           flexDirection: "column",
+    //           padding: "24px",
+    //         }}
+    //       >
+    //         <Text style={{ fontSize: 30, fontWeight: 600 }}>
+    //           Michael Lin Interview
+    //         </Text>
+    //         <Text>Speakers: Michael Lin, Claire Rosenfeld</Text>
+    //         <Text>Location: Stanford, CA</Text>
+    //         <Text>Date: March 2 2020</Text>
+    //         <Text>Length: 52 minutes</Text>
+    //         <Text>Topics: COVID, Stanford University</Text>
+    //       </div>
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           flexDirection: "column",
+    //           padding: "24px",
+    //         }}
+    //       >
+    //         <AuditoryCuesDropdown/>
+    //       </div>
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           flexDirection: "column",
+    //           padding: "24px",
+    //         }}
+    //       >
+    //         <SpeechTypesDropdown/>
+    //       </div>
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           flexDirection: "column",
+    //           padding: "24px",
+    //         }}
+    //       >
+    //         <EmotionsDropdown/>
+    //       </div>
+    //     </div>
+    //     <div
+    //       className="site-layout-content"
+    //       style={{
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         alignItems: "center",
+    //       }}
+    //     >
+    //       <div style={{ height: 200, overflow: "scroll" }}>
+    //         <Text
+    //           className="clickable-text"
+    //           onClick={() =>
+    //             (audio.audioEl.current.currentTime = words[0].start_time)
+    //           }
+    //         >
+    //           Speaker 1:{" "}
+    //         </Text>
+    //         {words.map((wordObj) => {
+    //           let val = null;
+    //           if (context === "people" && term === wordObj.speaker_tag) {
+    //             val = (
+    //               <Text
+    //                 className="clickable-text"
+    //                 mark
+    //                 onClick={() =>
+    //                   (audio.audioEl.current.currentTime =
+    //                     wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+    //                 }
+    //               >
+    //                 {wordObj.word}{" "}
+    //               </Text>
+    //             );
+    //           } else if (
+    //             context === "text" &&
+    //             term === wordObj.word.toLowerCase()
+    //           ) {
+    //             val = (
+    //               <Text
+    //                 className="clickable-text"
+    //                 mark
+    //                 onClick={() =>
+    //                   (audio.audioEl.current.currentTime =
+    //                     wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+    //                 }
+    //               >
+    //                 {wordObj.word}{" "}
+    //               </Text>
+    //             );
+    //           } else if (
+    //             context === "emotions" &&
+    //             term === wordObj.emotion.toLowerCase()
+    //           ) {
+    //             val = (
+    //               <Text
+    //                 className="clickable-text"
+    //                 mark
+    //                 onClick={() =>
+    //                   (audio.audioEl.current.currentTime =
+    //                     wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+    //                 }
+    //               >
+    //                 {wordObj.word}{" "}
+    //               </Text>
+    //             );
+    //           } else {
+    //             val = (
+    //               <Text
+    //                 className="clickable-text"
+    //                 onClick={() =>
+    //                   (audio.audioEl.current.currentTime =
+    //                     wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+    //                 }
+    //               >
+    //                 {wordObj.word}{" "}
+    //               </Text>
+    //             );
+    //           }
+    //           if (speaker !== wordObj.speaker_tag) {
+    //             speaker = wordObj.speaker_tag;
+    //             return (
+    //               <>
+    //                 <br />
+    //                 <Text
+    //                   className="clickable-text"
+    //                   onClick={() =>
+    //                     (audio.audioEl.current.currentTime =
+    //                       wordObj.start_time - 1 > 0
+    //                         ? wordObj.start_time - 1
+    //                         : 0)
+    //                   }
+    //                 >
+    //                   {" "}
+    //                   Speaker {speaker}:{" "}
+    //                 </Text>
+    //                 {val}
+    //               </>
+    //             );
+    //           } else {
+    //             return val;
+    //           }
+    //         })}
+    //       </div>
+    //       <ReactAudioPlayer
+    //         style={{ marginTop: 20 }}
+    //         ref={(element) => {
+    //           audio = element;
+    //         }}
+    //         src="https://storage.googleapis.com/audio-bucket-206/test_interview.mp3"
+    //         controls
+    //       />
+    //     </div>
+    //   </Content>
+    // </Layout>
+  // );
 }
 
 function Search({ initValue, initContext, setSearchContext, setSearchTerm }) {

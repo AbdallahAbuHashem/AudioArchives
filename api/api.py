@@ -11,6 +11,7 @@ from firebase_admin import firestore
 from .emotion.examples import lstm_example
 import threading
 import sys
+import json
 
 
 # Use a service account
@@ -39,7 +40,6 @@ app = Flask(__name__)
 def upload_file():
     # here we want to get the value of file_path and name (i.e. ?file_path=some-value&name=name)
     if request.method == 'POST':
-        print(request.data)
         file = request.data
         name = request.args.get('name')
         type = request.args.get('type')
@@ -52,7 +52,7 @@ def upload_file():
             'audioLink': uri,
         })
         sounds = inference.run_yamnet(uri)
-        encoding = speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED
+        encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16
         if ext == 'flac':
             encoding = speech.RecognitionConfig.AudioEncoding.FLAC
         elif ext == 'mp3':
@@ -60,8 +60,8 @@ def upload_file():
         output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}.{}'.format(name, ext), speakers_num, encoding)
         align_sound_speech(sounds, output)
 
-        emotions = lstm_example.lstm_get_emotion(request.args.get('file_path'))
-        align_emotion_speech(emotions, output)
+        # emotions = lstm_example.lstm_get_emotion(request.args.get('file_path'))
+        # align_emotion_speech(emotions, output)
 
         output_uri = upload.upload_output('audio-bucket-206', {'output': output, 'sounds': sounds}, "{}.json".format(name))
         doc_ref.update({
@@ -69,3 +69,12 @@ def upload_file():
             'status': 'Processed',
         })
         return {'file_output': output, 'output_uri': output_uri}
+
+@app.route('/update_json', methods = ['POST'])
+def update_json():
+    if request.method == 'POST':
+        # print(request.json)
+        file = json.loads(request.data)
+        name = request.args.get('name')
+        uri = upload.upload_output('audio-bucket-206', file, "{}_updated.json".format(name))
+        return uri

@@ -54,11 +54,15 @@ export default function Upload() {
       title,
       speakersNumber,
       format,
+      id: audioRef.id,
       status: 'Processing',
       audioLink: '',
       jsonLink: '',
-      peopleList: [],
+      location: '',
+      speakers: [],
       date: '',
+      length: -1,
+      topics: [],
     })
     fetch(`/upload?name=${title}&type=${type}&speakers=${speakersNumber}&ext=${format}&key=${audioRef.id}`, {
       method: 'POST',
