@@ -1,12 +1,13 @@
-import logo from './logo.svg';
-import notification from './img/Notification.png';
-import mic from './img/Mic.png';
-import './App.css';
+import '../App.css';
+import './Browse.css';
+import notification from '../img/Notification.png';
+import mic from '../img/Mic.png';
 import { Button, Layout } from 'antd';
 import { AutoComplete } from 'antd';
 import React, { useEffect, useState } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
-import firestore from './firebase';
+import firestore from '../firebase';
+
 
 import {
   BrowserRouter as Router,
@@ -19,29 +20,25 @@ import {
   useLocation
 } from "react-router-dom";
 
-import SearchResults from './Pages/SearchResults'
-import InterviewSearchPreview from './Pages/InterviewSearchPreview'
-import Upload from './Pages/Upload'
-import Browse from './Pages/Browse'
+import InterviewSearchPreview from './InterviewSearchPreview'
+import Upload from './Upload'
+import App from '../App'
 
 const { Header, Footer, Sider, Content } = Layout;
 
-export default function App() {
+export default function Browse() {
   return (
     <Router>
       <div>
         <Switch>
-          <Route path="/search_results">
-            <SearchResults />
-          </Route>
           <Route path="/interview_search_preview">
             <InterviewSearchPreview />
           </Route>
           <Route path="/upload">
             <Upload />
           </Route>
-          <Route path="/browse">
-            <Browse />
+          <Route path="/search">
+            <App />
           </Route>
           <Route path="/">
             <Home />
@@ -110,9 +107,9 @@ function Home() {
     <Layout className="container">
       <Header className="header-container">
         <div className="header-content">
-          <div className="nav-links">
-            <Link to="/browse" className="header-links">Browse</Link>
-            <div className="header-links-selected">Search</div>
+          <div className="nav-links"> 
+            <div className="header-links-selected">Browse</div>
+            <Link to="/search" className="header-links">Search</Link>
             <Link to="/upload" className="header-links">Upload</Link>
           </div>
           <img src={notification} height={40} width={40}/>
@@ -121,25 +118,30 @@ function Home() {
       <Content>
         <div className="content-container">
           <div className="title" id="main-page-title">
-            Audio Archives
+            Browse
           </div>
-          <div className="search-area">
-            <input
-            options={options}
-            className="autocomplete"
-            onSelect={onSelect}
-            onSearch={onSearch}
-            placeholder="Search your archives"
-          />
-          <div className="space"></div>
-          <Button
-            type="primary"
-            className="search-button"
-          >Search
-          </Button>
-          </div>
+          <ul className="flex-container wrap" style={{maxWidth: '70%'}}>
+            {files.map(item => <InterviewTile item={item} />)}
+          </ul>
         </div>
       </Content>
     </Layout>
   );
+}
+
+const InterviewTile = ({ item }) => {
+  const todayDate = new Date()
+  const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
+  return (
+    <li className="interview-tile">
+      <div className="interview-tile-upper-container">
+        <img src={mic} className="interview-mic" />
+        <div className="interview-title"> {item.title || item.filename} </div>
+      </div>
+      <div className="interview-tile-lower-container">
+        <div className={item.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.status}`} </div>
+        <div className="interview-date"> {item.data || todayString} </div>
+      </div>
+    </li>
+  )
 }
