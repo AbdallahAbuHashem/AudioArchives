@@ -12,6 +12,7 @@ from .emotion.examples import lstm_example
 import threading
 import sys
 import json
+import pydub
 
 
 # Use a service account
@@ -30,9 +31,16 @@ def align_sound_speech(sounds, speech_output):
 
 def align_emotion_speech(emotions, speech_output):
     for word_obj in speech_output:
-        idx = int(round(word_obj['start_time'],0))
-        emotion_chunk = emotions[idx]
-        word_obj['emotion'] = emotion_chunk[2]
+        idx = int(word_obj['start_time']/2/5)
+        print(word_obj['start_time'])
+        print("index: {}".format(idx))
+        print("start_time {}".format(word_obj['start_time']))
+        print("length of emotions: {}".format(len(emotions)))
+        if idx<len(emotions):
+            emotion_chunk = emotions[idx]
+            word_obj['emotion'] = emotion_chunk[2]
+        else:
+            word_obj['emotion'] = 'neutral'
 
 
 app = Flask(__name__)
@@ -47,7 +55,7 @@ def upload_file():
         speakers_num = int(request.args.get('speakers'))
         ext = request.args.get('ext')
         key = request.args.get('key')
-        uri = upload.upload_blob('audio-bucket-206', file, "{}.{}".format(name, ext), type)
+        uri = upload.upload_blob('audio-bucket-206', file, "{}".format(name), type)
         doc_ref = db.collection('audioarchives').document(key)
         doc_ref.update({
             'audioLink': uri,
@@ -58,11 +66,13 @@ def upload_file():
             encoding = speech.RecognitionConfig.AudioEncoding.FLAC
         elif ext == 'mp3':
             encoding = speech.RecognitionConfig.AudioEncoding.MP3
-        output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}.{}'.format(name, ext), speakers_num, encoding)
+        output = transcribe.transcribe_gcs('gs://audio-bucket-206/{}'.format(name), 1, encoding)
         align_sound_speech(sounds, output)
 
-        # emotions = lstm_example.lstm_get_emotion(request.args.get('file_path'))
-        # align_emotion_speech(emotions, output)
+        emotions = lstm_example.lstm_get_emotion(request.args.get('file_path'))
+        align_emotion_speech(emotions, output)
+
+        print(output)
 
         output_uri = upload.upload_output('audio-bucket-206', {'output': output, 'sounds': sounds}, "{}.json".format(name))
         doc_ref.update({

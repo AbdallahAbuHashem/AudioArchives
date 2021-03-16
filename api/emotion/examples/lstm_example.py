@@ -26,16 +26,17 @@ def section_by_section_analysis(model, audio_file, to_flatten):
     emotions = []
 
     entireAudio = AudioSegment.from_wav(audio_file)
-    chunkSize = 1000 #this means a chunk is 1 second
-    numChunks = len(entireAudio) / chunkSize
+    print('audio length is {}'.format(len(entireAudio)))
+    chunkSize = 5000 #this means a chunk is 5 seconds
+    numChunks = int(len(entireAudio) / chunkSize)
+    print("numChunks are {}".format(numChunks))
     temporaryFileName = 'tempFile.wav'
     previousEndTime = 0
-    for endTime in range(chunkSize, len(entireAudio)+chunkSize, chunkSize):
-        if (endTime > len(entireAudio)):
-            lastBit = (len(entireAudio) - previousEndTime)*-1
-            newAudio = entireAudio[lastBit:]
-        else:
-            newAudio = entireAudio[previousEndTime:endTime]
+    for chunk in range(int(numChunks)):
+        endTime=chunk*chunkSize+chunkSize
+        if endTime>len(entireAudio):
+            endTime=len(entireAudio)
+        newAudio = entireAudio[chunk:chunk*chunkSize]
         newAudio.export(temporaryFileName, format="wav") #Exports to a wav file in the current path.
         predicted_value = model.predict_one(
             get_feature_vector_from_mfcc(temporaryFileName, flatten=to_flatten))
@@ -89,7 +90,7 @@ def lstm_get_emotion(audio_file):
     sys.stderr.write(path + '\n')
     newmodel.load_model(to_load=path)
     newmodel.train(x_train, y_train, x_test, y_test_train, n_epochs=0)
-    audio_file = str(pathlib.Path(__file__).parents[1].absolute()) + "/dataset/laughter_test_track.wav"
+    audio_file = str(pathlib.Path(__file__).parents[1].absolute()) + "/dataset/test.wav"
     sys.stderr.write('Looking for audio file ' + audio_file)
 
 

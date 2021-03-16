@@ -78,6 +78,83 @@ export default function InterviewSearchPreview() {
     console.log(e)
     setCurrTime(e)
   }
+
+  const generateText = () => {
+    let toRenderList = []
+    let currObj = {
+      speaker: '',
+      timestamp: '00:00',
+      words: []
+    }
+    if (transcriptObj) {
+      currObj['speaker'] = transcriptObj['output'][0]['speaker_tag']
+      let minutes = (parseInt(transcriptObj['output'][0]['start_time'] / 60)).toString().padStart(2,'0')
+      let seconds = (parseInt(transcriptObj['output'][0]['start_time'] % 60)).toString().padStart(2,'0')
+      currObj['timestamp'] = `${minutes}:${seconds}`
+      transcriptObj['output'].forEach(wordObj => {
+        if (currObj['speaker'] !== wordObj.speaker_tag) {
+          toRenderList.push({...currObj})
+          let minutes = (parseInt(wordObj['start_time'] / 60)).toString().padStart(2,'0')
+          let seconds = (parseInt(wordObj['start_time'] % 60)).toString().padStart(2,'0')
+          currObj = {
+            speaker: wordObj.speaker_tag,
+            timestamp: `${minutes}:${seconds}`,
+            words: [wordObj],
+          }
+        } else {
+          currObj['words'].push(wordObj)
+        }
+      });
+      toRenderList.push({...currObj})
+    }
+    return (
+      <>
+      {toRenderList.map((utterance) => {
+        console.log(utterance)
+        let wordsComp = utterance['words'].map((wordObj) => {
+          let val = (
+            <Text
+              className="clickable-text"
+              onClick={() =>
+                (audio.audioEl.current.currentTime =
+                  wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
+              }
+            >
+              {wordObj.word}{" "}
+            </Text>
+          )
+          if (wordObj.start_time > currTime-1 && wordObj.end_time < currTime + 1) {
+            val = (
+              <mark className="mark-transcript">{val}</mark>
+            )
+          }
+          return val;
+        })
+
+        let utteranceComp = (
+          <div style={{display: 'flex'}}>
+            <div style={{marginRight: 16}}>
+              <Text className="timestamp-transcript">{utterance.timestamp}</Text>
+            </div>
+            <div>
+              <Text
+                className="clickable-text"
+                style={{fontWeight: 'bold'}}
+              >
+                {utterance.speaker}:{" "}
+              </Text>
+              {wordsComp}
+              <br />
+            </div>
+          </div>
+        )
+        
+        return utteranceComp
+      })}
+      </>
+    )
+  }
+
   return (
     <Layout className="container">
       <Header className="header-container">
@@ -98,47 +175,7 @@ export default function InterviewSearchPreview() {
           </div>
           
           <div className="interview-transcript">
-            {transcriptObj && transcriptObj['output'].map((wordObj) => {
-              let val = null;
-                val = (
-                  <Text
-                    className="clickable-text"
-                    onClick={() =>
-                      (audio.audioEl.current.currentTime =
-                        wordObj.start_time - 1 > 0 ? wordObj.start_time - 1 : 0)
-                    }
-                  >
-                    {wordObj.word}{" "}
-                  </Text>
-                );
-              if (speaker !== wordObj.speaker_tag) {
-                speaker = wordObj.speaker_tag;
-                val = (
-                  <>
-                    <br />
-                    <Text
-                      className="clickable-text"
-                      style={{fontWeight: 'bold'}}
-                      onClick={() =>
-                        (audio.audioEl.current.currentTime =
-                          wordObj.start_time - 1 > 0
-                            ? wordObj.start_time - 1
-                            : 0)
-                      }
-                    >
-                      {speaker}:{" "}
-                    </Text>
-                    {val}
-                  </>
-                );
-              }
-              if (wordObj.start_time > currTime-1 && wordObj.end_time < currTime + 1) {
-                val = (
-                  <mark className="mark-transcript">{val}</mark>
-                )
-              }
-              return val;
-            })}
+            {generateText()}
           </div>
           <ReactAudioPlayer
             style={{marginBottom: 24, marginTop: 24}}

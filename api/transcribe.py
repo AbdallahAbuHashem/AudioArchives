@@ -21,7 +21,7 @@ def transcribe_gcs(gcs_uri, speakers_num, encoding):
         encoding=encoding, #speech.RecognitionConfig.AudioEncoding.FLAC,
         sample_rate_hertz=48000,
         language_code="en-US",
-        audio_channel_count=1,
+        audio_channel_count=2,
         enable_automatic_punctuation=True,
         enable_speaker_diarization=True,
         diarization_speaker_count=speakers_num,
