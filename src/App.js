@@ -59,12 +59,15 @@ export default function App() {
 
 function Home() {
   const history = useHistory();
-  const [searchStr, setSearchStr] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchStr, setSearchStr] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [clips, setClips] = useState([]);
-  var searchResults = []; // will contain indices to the clips that will be returned to the user, sorted by relevance
-  const sortedIds = []; // will contain the final sorted list of clip ID's
 
+  const [sortedIds, setSortedIds] = useState([]); // will contain the final sorted list of clip ID's
+
+  var processedClips = [];
+  var searchResults = []; // will contain indices to the clips that will be returned to the user, sorted by relevance
   let unigrams = new Map(); //map of words to their frequencies
   let bigrams = new Map(); //map of pairs of words to their frequencies
 
@@ -78,9 +81,13 @@ function Home() {
     })
   },[])
 
+  useEffect(() => {
+    setSearchStr(searchInput.toLowerCase().split(" "));
+  },[searchInput])
+
   const computeFrequencies = async () => {
     for (const clip of clips) {
-      if (clip.status == "Processed") {
+      if (clip.status == "Processed" || clip.status == "Finished") {
         var unigram_frequencies = new Map();
         var bigram_frequencies = new Map();
 
@@ -109,6 +116,7 @@ function Home() {
         bigram_frequencies.set(id, transcript.length - 1);
         unigrams.set(id, unigram_frequencies);
         bigrams.set(id, bigram_frequencies);
+        processedClips.push(clip);
       } 
     }
   }
@@ -118,18 +126,15 @@ function Home() {
     var unigram_score = Array(unigrams.size).fill(1);
     var bigram_score = Array(unigrams.size).fill(1);
 
-    console.log(unigrams);
-    console.log(unigrams.size);
-
-    for (let i = 0; i < search.length; i++) {
+    for (let i = 0; i < searchStr.length; i++) {
         var uni_tfidf = []; //each index is the tfidf score for each document for a given word
         var bi_tfidf = []; 
         var uni_df = 0;
         var bi_df = 0;
-        clips.forEach(function(clip) {
-          if (clip.status == "Processed") {
-            if (unigrams.get(clip.id).has(search[i])) {
-                var uni_count = unigrams.get(clip.id).get(search[i]);
+        for (const clip of clips) {
+          if (clip.status == "Processed" || clip.status == "Finished") {
+            if (unigrams.get(clip.id).has(searchStr[i])) {
+                var uni_count = unigrams.get(clip.id).get(searchStr[i]);
                 uni_count /= unigrams.get(clip.id).get(clip.id);
                 uni_tfidf.push(uni_count);
                 uni_df += 1;
@@ -138,7 +143,7 @@ function Home() {
             }
 
             if (i > 0) {
-                let bigram = search[i-1] + "," + search[i];
+                let bigram = searchStr[i-1] + "," + searchStr[i];
                 if (bigrams.get(clip.id).has(bigram)) {
                     var bi_count = bigrams.get(clip.id).get(bigram);
                     bi_count /= bigrams.get(clip.id).get(clip.id);
@@ -149,7 +154,7 @@ function Home() {
                 }
             }
           }
-        });
+        };
 
         let uni_idf = Math.log((1 + unigram_score.length) / (1 + uni_df)) + 1;
         let bi_idf = Math.log((1 + bigram_score.length) / (1 + bi_df)) + 1;
@@ -163,11 +168,13 @@ function Home() {
     }
 
     var score = Array(unigrams.size).fill(1);
-    console.log(unigrams.size);
     for (let i = 0; i < unigram_score.length; i++) {
+      if (searchStr.length > 1) {
         score[i] = (0.33 * unigram_score[i])  + (0.66 * bigram_score[i]);
+      } else {
+        score[i] = (0.33 * unigram_score[i]);
+      }
     }
-
     
     return score;
   }
@@ -182,25 +189,34 @@ function Home() {
     var ranked = clipRating.slice().map(function(v){return sorted.indexOf(v)}); //i.e. [3, 1, 4, 6, 0, 2, 5], 0 --> 5th clip is the best, 6 --> 4th clip is worst
 
     searchResults = Array(numResults).fill(0);
+    var used_indices = []
     for (let i = 0; i < ranked.length; i++) {
         let ranking = ranked[i];
         if (ranking < numResults) {
-            searchResults[ranking] = i;
+          let new_ranking = ranking;
+          while (used_indices.includes(new_ranking)) {
+            new_ranking += 1;
+          }
+          searchResults[new_ranking] = i;
+          used_indices.push(new_ranking);
         }
     }
   }
 
   const search = async () => {
     await computeFrequencies();
+
     findClips();
 
     let sorted_temp = [];
     searchResults.forEach(function(clipIndex) {
-        sortedIds.push(clips[clipIndex]);
+        sorted_temp.push(processedClips[clipIndex]);
     });
+    setSortedIds(sorted_temp);
   }
   const onClick = (searchText) => {
     setHasSearched(true);
+    
     search();
   };
 
@@ -227,8 +243,8 @@ function Home() {
               <input
               className="autocomplete"
               placeholder="Search your archives"
-              value={searchStr}
-              onChange={(text) => setSearchStr(text.target.value)}
+              value={searchInput}
+              onChange={(text) => setSearchInput(text.target.value)}
               id="search-bar"
             />
             <div className="space"></div>
@@ -247,8 +263,8 @@ function Home() {
               <input
               className="autocomplete"
               placeholder="Search your archives"
-              value={searchStr}
-              onChange={(text) => setSearchStr(text.target.value)}
+              value={searchInput}
+              onChange={(text) => setSearchInput(text.target.value)}
               id="search-bar"
               />
               <div className="space"></div>
@@ -270,17 +286,19 @@ function Home() {
 }
 
 const InterviewTile = ({ item }) => {
-  const todayDate = new Date()
+  console.log(item);
+  const history = useHistory();
+  const todayDate = new Date();
   const todayString = `${todayDate.getMonth() + 1}/${todayDate.getDate()}/${todayDate.getFullYear()}`
   return (
-    <li className="interview-tile">
+    <li className={"interview-tile interview-clickable"} onClick={() => {history.push(`/finalize_interview_data?key=${item.key}`)}}>
       <div className="interview-tile-upper-container">
         <img src={mic} className="interview-mic" />
         <div className="interview-title"> {item.title || item.filename} </div>
+        <div className="interview-title"> {item.speakers} </div>
       </div>
       <div className="interview-tile-lower-container">
-        <div className={item.status === "Processed" ? "interview-status interview-processed" : "interview-status"}> {`Status: ${item.status}`} </div>
-        <div className="interview-date"> {item.data || todayString} </div>
+        <div className="interview-date"> {item.date || todayString} </div>
       </div>
     </li>
   )
