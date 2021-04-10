@@ -1,70 +1,28 @@
-# Getting Started with Create React App
+# Audio Archives CS 206 Demo
+This repo is a ReactJS + Flask demo of a tool to index and search through audio files. It was built for Stanford CS 206: Exploring Computational Journalism. Instructions here include set up, features and ways to fit the prototype to your needs
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Setting up cloud services
+The app relies on a number of Google services. You need to go to Google Cloud Services, create a project, and from the left burger menu head to IAM & Admin > Service Accounts, create a service account, and create a key for the service account and download it. The path for this key is important since we will set/export it as an environment variable. You can add this to your bash profile, or you can set/export it everytime you wanna run the backend. Use `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key"`
 
-## Available Scripts
+From your Google Cloud Console, make sure to select the project. Go to bucket storage, and create a bucket named `audio-bucket-206`. If you wanna change the name, update the code in the `api` folder. Make sure that your service key has complete permissions to the bucket.
 
-In the project directory, you can run:
+You also need to add Firestore to the project. From the search bar in Google Cloud Console, lookup Firestore, and make sure it is enabled. Set up Firestore for testing, which makes sure that your security rules allows the app to read and write. From the Firebase Console, obtain the config information for your project, and put them in `src/firebase.js` file within this directory
 
-### `yarn start`
+### Explanation of why we use buckets and Firestore
+The storage flow for this app is as follows: A user uploads an audio file with some preliminary metadata. We store the metadata in Firestore, and we upload the audio file to the bucket. Following this, we trigger indexing to happen in our backend, which is in the `api` folder of this repo. Once indexing is done, a file of `.json` is uploaded to the bucket, and a reference to the file is added to Firestore. When a user adds the final metadata to the file (speakers names, location, date), we update the Firestore with the finalized metadata. Essentially, Firestore keeps track of the metadata and points to the audio file and the indexing file `.json`.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Local setup
+First, make sure that you have whatever is needed to run a React app and a Flask app.
 
-### `yarn test`
+Second, clone and run `npm install` in this directory. Also, install all Python libraries required by the `api` code
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Third, make sure that you have completed all the cloud service steps mentioned above
 
-### `yarn build`
+Fourth, run `npm start` to run the frontend. run `npm start-api` to run the backend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Features
+The frontend currently allows you to upload, search and browse through an audio archive. In the transcript page, the only drop down that works is the emotions dropdown. However, all indexing necessary for the other dropdowns already happens on the backend. In specific, each word is tagged with a sound, and an emotion. In terms of timeline, every 4 seconds are also assigned a sound, so if a sound is not a word (e.g. laughter), it is included in the `.json` indexed file.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Contact
+Feel free to email me at aabuhash@stanford.edu
