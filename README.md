@@ -24,5 +24,10 @@ Fourth, run `npm start` to run the frontend. run `npm start-api` to run the back
 ## Features
 The frontend currently allows you to upload, search and browse through an audio archive. In the transcript page, the only drop down that works is the emotions dropdown. However, all indexing necessary for the other dropdowns already happens on the backend. In specific, each word is tagged with a sound, and an emotion. In terms of timeline, every 4 seconds are also assigned a sound, so if a sound is not a word (e.g. laughter), it is included in the `.json` indexed file.
 
+## Issues you may face
+This prototype was built for a specific demo in mind, so some config is hardcoded. When transcribing, if your audio uses more than 1 channel, we highly recommend converting it to 1 channel for the current implementation to work. If you want to work by default with more than a channel, look into `api/transcribe.py`, and play more with the config. Simply changing the number of channels to 2 will break diarization (identification of speakers). We weren't able to find a solution that takes advantage of the multiple channels and do diarization within the timeframe we had, so we stuck with using mono sound. Checkout `librosa` library for Python, which converts things to mono quite easily.
+
+Navigation between pages is sometimes broken. If that's the case, just refresh the page, and you will get the correct page. We may push a solution to this soon.
+
 ## Contact
 Feel free to email me at aabuhash@stanford.edu
